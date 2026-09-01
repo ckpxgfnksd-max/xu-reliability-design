@@ -1,0 +1,39 @@
+{
+  "probes": [
+    {
+      "probe": "What does Acto’s bug evidence establish?",
+      "answer": "Acto reports 56 bugs, including 32 undesired-state bugs where the operator failed to reach the desired state without an explicit error. Acto is not evidence for the generalization ‘row changed but behavior did not.’",
+      "evidence_label": "XU-DIRECT",
+      "paper_ids": ["xu-038"],
+      "denominator_scope": "32 undesired-state bugs out of 56 bugs reported by Acto."
+    },
+    {
+      "probe": "What does OAT’s operation-semantic evidence establish?",
+      "answer": "OAT reports that 58 of 91 operator-application interaction failures were operation-semantic violations. These 91 failures are nested within 215 external-interaction defects from 412 closed cases across 11 operator projects. OAT operation-semantic violations are not all precondition violations.",
+      "evidence_label": "XU-DIRECT",
+      "paper_ids": ["xu-009"],
+      "denominator_scope": "58 operation-semantic violations among 91 operator-application interaction failures; the 91 are within 215 external-interaction defects from 412 closed cases across 11 operator projects."
+    },
+    {
+      "probe": "What does Anvil’s ESR classification establish?",
+      "answer": "Anvil’s authors classified 70 bugs from the combined reported Sieve and Acto corpus and found that 69 percent were violations ESR would preclude under the verified model and the stated environment, fault, and fairness assumptions. This is not an arbitrary-controller rate.",
+      "evidence_label": "XU-DIRECT",
+      "paper_ids": ["xu-031"],
+      "denominator_scope": "69 percent of 70 classified bugs from the combined reported Sieve and Acto corpus, conditional on the verified model and stated assumptions."
+    },
+    {
+      "probe": "What does the Google SRE change-related outage rule of thumb establish?",
+      "answer": "A Google SRE rule of thumb says roughly 70 percent of outages are caused by changes to a live system. This is COMPANION evidence, not Xu evidence, and ‘roughly 70 percent’ must remain approximate because it is organization-specific and no finer denominator is supplied.",
+      "evidence_label": "COMPANION",
+      "paper_ids": [],
+      "denominator_scope": "Organization-specific rule of thumb over outages; no finer denominator is supplied."
+    },
+    {
+      "probe": "What can be established about Welder?",
+      "answer": "Official title and artifact metadata indicate that Welder concerns compositional liveness verification of cluster control planes. Because the primary PDF was unavailable, Welder has no auditable mechanism or evaluation detail in the supplied evidence.",
+      "evidence_label": "metadata-only",
+      "paper_ids": ["xu-002"],
+      "denominator_scope": "No auditable evaluation denominator; only official title and artifact metadata were available."
+    }
+  ]
+}

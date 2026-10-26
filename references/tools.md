@@ -129,6 +129,9 @@ a drop-in library for every stack.
 - Use for: AI-generated TLA+/formal models.
 - Required metrics: syntax, runtime, trace conformance, safety/liveness invariant correctness, and
   bug reproduction—not “model checker returned green” alone.
+- Execution option (`COMPANION`): a focused single-agent Specula Lite pilot can model/check and
+  reproduce candidates without the full pipeline. Lite skips implementation trace validation;
+  see [specula-pilot.md](specula-pilot.md) before choosing it.
 - Red flag: repairing a generated model by weakening the invariant or abstracting out the failing
   behavior.
 

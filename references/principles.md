@@ -377,19 +377,21 @@ failure rate alone.
 **Counterexample.** A fixed timeout chosen from lab averages classifies a healthy-but-slow mobile
 path as failed and triggers retries that amplify congestion.
 
-## Candidate operational lens
+## Operational lens
 
-The 14 principles should not become 14 mandatory sections in every review. The skill should route
-them through seven questions:
+The 14 principles must not become 14 mandatory sections in every review. `SKILL.md` routes them
+through eight triage questions, each owning its principles exactly once:
 
-1. What intent enters, and how is unsafe intent rejected and repaired? (`P1`, `P9`)
-2. What is authoritative state, and what can observers miss or see late? (`P2`, `P12`)
-3. What transitions can crash, repeat, race, or need undo? (`P3`, `P10`)
-4. Which seams and hidden semantics can disagree? (`P4`, `P13`)
-5. What behavior proves correctness, including progress and stability? (`P5`, `P11`)
-6. How are adaptation, fault propagation, and blast radius bounded? (`P6`, `P7`)
-7. How realistic, risk-calibrated, and decision-relevant is the evidence? (`P8`, `P14`)
+1. Q1 Intent — what enters, and how unsafe intent is rejected and repaired (`P1`, `P9`)
+2. Q2 State — what is authoritative, and what observers can miss, see late, or see twice (`P2`)
+3. Q3 Change — which transitions can crash, repeat, race, or need undo (`P3`, `P10`)
+4. Q4 Seams — which contracts and hidden semantics can disagree, and where enforcement sits
+   (`P4`, `P13`)
+5. Q5 Correctness — what behavior proves correctness, including progress and stability (`P5`,
+   `P11`)
+6. Q6 Control — how adaptation, fault propagation, and blast radius are bounded (`P6`, `P7`)
+7. Q7 Fidelity — how realistic and calibrated the evidence and assumptions are (`P8`, `P14`)
+8. Q8 Diagnosability — what recorded evidence separates competing causes (`P12`)
 
-This preserves breadth without forcing irrelevant boilerplate. The final skill should first select
-questions by trigger, report only selected questions, and open a risk when a high-impact trigger is
-unknown.
+The skill first selects questions by observable trigger, reports only selected questions, and opens
+an `unknown` when a high-impact trigger cannot be answered.

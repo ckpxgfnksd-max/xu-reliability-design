@@ -8,10 +8,12 @@ The skill turns recurring findings across configuration, controllers, distribute
 
 - `SKILL.md` — compact entry point and task router.
 - `references/principles.md` — 14 corpus-wide principles. Every principle includes a guideline, acceptance criterion, example, counterexample, and full-text evidence anchors.
-- `references/routes/` — seven task-specific routes covering intent, state, change, seams, correctness, control, and evidence.
+- `references/routes/` — eight task-specific routes covering intent, state, change, seams, correctness, control, fidelity, and diagnosability.
 - `references/checklists.md` — review and acceptance checklists.
 - `references/examples.md` — worked design-review examples.
 - `references/formal-verification.md` — guidance for choosing specifications, model checking, testing, and runtime checks.
+- `references/specula-pilot.md` — authorized focused investigations, real-code reproduction, and explicit Lite conformance and dependency-provenance limits.
+- `evals/` — versioned cases, rubrics and aggregation, including the five ownership-pilot prompts.
 - `references/paper-ledger.md` — the 97-paper evidence ledger.
 - `EVALS.md` — evaluation protocol, results, limitations, and the gate for future automated optimization.
 
@@ -74,8 +76,10 @@ The skill distinguishes three attribution levels:
 ## Validation status
 
 - Package and frontmatter validation: pass.
-- Independent release review: GO.
+- Current revision review: an independent fixed review passed after correcting two non-blocking evidence and status findings. The original verdict is retained in the private run record.
 - Attribution probe: 5/5 after preserving and correcting the original 4/5 failure case.
+- Ownership development cases: 20 outputs (five prompts, two repetitions per arm); correct dispositions 10/10 in both arms, complete coverage 8/10 to 10/10. No held-out or statistical uplift claim.
+- TLC dependency provenance: a mismatched replacement stays blocked pending independently trusted authentication; prior unresolved checker outputs are inconclusive for assurance.
 - Automated optimization: intentionally not started; a protocol-compliant per-case routed baseline has not yet been certified.
 
 See [EVALS.md](EVALS.md) for the complete evaluation protocol and limitations.

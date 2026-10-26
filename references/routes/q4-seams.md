@@ -1,8 +1,7 @@
 # Q4 — Interaction contracts and semantics-aligned placement
 
-Principles: P4, P13. Default provenance: `XU-SYNTHESIS` from `xu-046`, `xu-047`, `xu-009`,
-`xu-069`, `xu-019`, `xu-028`, `xu-080`, `xu-084`, `xu-007`, `xu-014`, `xu-017`, `xu-044`,
-`xu-052`, `xu-071`.
+Principles: P4, P13. Default provenance: `XU-SYNTHESIS`; anchors CSI failures `xu-046`, Rainmaker
+`xu-047`, OAT `xu-009`, Kscaler `xu-014`, Oxbow `xu-007`.
 
 ## Guideline
 

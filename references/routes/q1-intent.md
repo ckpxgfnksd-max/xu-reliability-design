@@ -1,8 +1,7 @@
 # Q1 — Intent boundary and usable repair
 
-Principles: P1, P9. Default provenance: `XU-SYNTHESIS` from `xu-097`, `xu-096`, `xu-094`,
-`xu-093`, `xu-090`, `xu-087`, `xu-086`, `xu-084`, `xu-073`, `xu-069`, `xu-068`, `xu-060`,
-`xu-052`, `xu-057`, `xu-033`, `xu-017`.
+Principles: P1, P9. Default provenance: `XU-SYNTHESIS`; anchors SPEX `xu-097`, PCheck `xu-087`,
+ctest `xu-068`, Too Many Knobs `xu-093`, access-denied study `xu-086`.
 
 ## Guideline
 

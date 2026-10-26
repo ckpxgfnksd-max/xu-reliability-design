@@ -1,24 +1,24 @@
 ---
 name: xu-reliability-design
-description: >-
-  Evidence-backed reliability and system-design review synthesized from Tianyin Xu's 97-entry
-  publication inventory, with full-text audit of every available paper and explicit metadata-only
-  limits. Use for configuration and policy changes, multi-step operations, controllers, caches or
-  replicas, component seams, fail-slow faults, recovery, access control, test fidelity, safe
-  extensions, AI-SRE action, and requests about 徐天音/Tianyin Xu's system-design principles. Do not
-  trigger for pure UI/content, isolated analysis, or a simple stateless feature unless requested.
+description: "Reliability review for live-system changes: config/policy, caches/replicas, retried mutations, dependency failures, controllers, authz, agents on production, recovery, test doubles, production diagnosis, and scoped formal-method pilots. Ranked risk chains with falsifiable acceptance; research claims labeled XU-DIRECT / XU-SYNTHESIS / COMPANION from an audited Tianyin Xu (徐天音) corpus; also explains Xu's principles. Not for UI/content or stateless features unless requested."
 ---
 
 # Xu Reliability Design
 
-Turn a proposal into an auditable argument that the system remains safe, makes progress, and can
-recover under live change. Do not substitute paper summaries or a long checklist for design
-judgment.
+Turn a proposal or repository change into an auditable argument that the system stays safe, makes
+progress, and can recover under live change. Do not substitute paper summaries or a long checklist
+for design judgment.
 
-The research boundary is the 97 entries on Tianyin Xu's official publication page captured on
-2026-09-01. Ninety-four available PDFs were full-text screened; three entries remain
-`metadata-only` (`xu-002`, `xu-003`, `xu-005`). A paper may be in the inventory without supporting
-a general reliability rule. See `references/paper-ledger.md` for the complete audit.
+Three modes:
+
+- **Review** (default): triage below, then answer only the selected questions.
+- **Investigate**: when asked to run a formal-method pilot or investigate a state/concurrency
+  failure, select the relevant questions and load `references/formal-verification.md` plus
+  `references/specula-pilot.md`. Execute only the authorized target and fault scope; a review
+  recommendation alone does not authorize installation, experiments, or implementation fixes.
+- **Explain**: when the request is about Tianyin Xu's research or principles rather than a design
+  under review, load `references/principles.md` and `references/research-map.md` and answer from
+  the principles, threads, and audited claims. Skip triage.
 
 ## Evidence discipline
 
@@ -28,133 +28,111 @@ a general reliability rule. See `references/paper-ledger.md` for the complete au
 - **COMPANION** — useful non-Xu practice. Keep its attribution and assumptions explicit.
 
 If a primary source was unavailable, say `metadata-only`; do not infer mechanisms from a title.
+`xu-002` Welder, `xu-003` MCon, and `xu-005` Rex TOCS are metadata-only in this snapshot: cite no
+mechanism, theorem, or number from them, and use Rex ATC `xu-017` for Rex.
 Use empirical numbers only when they change a decision, with the study population and denominator.
-Exact attribution guardrails live in `references/research-map.md`.
-
-## Fourteen corpus-wide principles
-
-These are `XU-SYNTHESIS`. The evidence, boundaries, guidelines, and examples are in
-`references/principles.md`.
-
-| ID | Principle |
-|---|---|
-| P1 | Make dangerous intent unrepresentable, rejectable, and repairable at the accepting boundary. |
-| P2 | Assume every observer has a partial, stale history that may omit events or move backward. |
-| P3 | Treat every live change as a crashable, retryable, resumable state transition. |
-| P4 | Make cross-component data and management semantics, versions, and preconditions explicit contracts. |
-| P5 | Judge correctness through end-to-end behavior and relational oracles. |
-| P6 | Put adaptive control inside a bounded envelope with arbitration, LKG, and stop conditions. |
-| P7 | Model silent, slow, intermittent, wrong, stale, and propagating faults—not only crashes. |
-| P8 | Exercise recovery and rare paths at a risk-calibrated cadence, realism, and blast radius. |
-| P9 | Minimize the control surface and make safe repair usable; watch for verifier workarounds. |
-| P10 | Treat recovery as a controlled workflow that must not worsen the incident. |
-| P11 | Correctness includes progress, stability, and model–implementation conformance. |
-| P12 | Preserve effective state, provenance, relationships, and counterfactual evidence by design. |
-| P13 | Place observation and enforcement where the needed semantic ground truth lives. |
-| P14 | Calibrate capacity, fault, timing, and fidelity assumptions against deployment distributions. |
-
-Do not force fourteen headings. First select the applicable questions.
+The corpus boundary, audit depth, metadata-only entries, and audited numbers live in
+`references/research-map.md`.
 
 ## Triage before review
 
-Mark a question `selected` only when at least one trigger is present. For an ambiguous high-impact
-trigger, mark `unknown`, name the evidence needed, risk owner, and blocked decision. Do not emit
-statuses for clearly irrelevant questions.
+Eight questions cover the fourteen corpus-wide principles (P1–P14, `references/principles.md`);
+each route file names its principles. Mark a question `selected` only when its trigger is answered
+yes from the artifact in front of you, not from what a system of this kind usually has. For a
+high-impact trigger you cannot answer, mark `unknown` and name the evidence needed, the risk owner,
+and the decision it blocks. Say nothing about questions whose trigger is no.
 
-| Question | Select when the design has… | Load |
+| Question | Select when you can answer yes | Load |
 |---|---|---|
-| Q1 Intent | configuration, policy, operator/agent input, unsafe extension, or excess knobs | `references/routes/q1-intent.md` |
-| Q2 State | cache/replica/events/restart, reused identity, stale authority, or change provenance | `references/routes/q2-state.md` |
-| Q3 Change | multi-effect mutation, migration, failover, retry, rollback, or irreversible step | `references/routes/q3-change.md` |
-| Q4 Seams | component/dependency/version boundary, hidden management semantics, or split ownership | `references/routes/q4-seams.md` |
-| Q5 Correctness | nontrivial invariant, reconciliation, concurrency, conservation, or formal model | `references/routes/q5-correctness.md` |
-| Q6 Control | feedback controller, autoscaling, traffic movement, automation, fail-slow propagation, or blast radius | `references/routes/q6-control.md` |
-| Q7 Evidence | recovery claim, emulator/mock/proxy, production diagnosis, benchmark, or uncalibrated capacity/fault assumption | `references/routes/q7-evidence.md` |
+| Q1 Intent | Does the design accept configuration, policy, credentials, operator or agent input, or plugins where a syntactically valid value can still be wrong for the environment, only take effect on a rarely run path, or interact with other knobs? | `references/routes/q1-intent.md` |
+| Q2 State | Does any decision read a cache, replica, event stream, checkpoint, or log rather than the authoritative state; can the same event or request arrive twice, late, or out of order; or can two non-controller writers (overlapping runs, old and new binaries) or a reused name target the same object? (A value written by a controller or through a shared actuator, and who else can write it: Q6.) | `references/routes/q2-state.md` |
+| Q3 Change | Is there any operation with more than one externally visible effect, that can be interrupted or retried, or that contains an irreversible step? Migrations, backfills, failovers, rotations, restores, and rollouts that transform persistent state or cross incompatible versions are typical; an ordinary restart of stateless replicas is not one, and a write followed by a cache invalidation that a TTL would repair is Q2, not Q3. | `references/routes/q3-change.md` |
+| Q4 Seams | Do two independently deployed components, versions, or teams have to agree on data format, units, ordering, error or partial-success semantics, hidden management preconditions, or ownership of shared state? | `references/routes/q4-seams.md` |
+| Q5 Correctness | Does correctness depend on an invariant across operations (conservation, uniqueness, exactly-once, eventual and stable match), on a reconciliation loop that must converge and stay converged (a feedback controller's own loop is Q6), on concurrency, on a formal model, or on behavior a real client sees through caches and gateways rather than on a row or return code? | `references/routes/q5-correctness.md` |
+| Q6 Control | Does anything act automatically on telemetry (autoscaler, tuner, traffic mover, remediation agent); do two controllers, tools, or an operator override share an actuator (concurrent runs of one non-controller job are Q2); or, on a path a caller waits on, can a dependency that is slow, intermittent, or partially failed while still connected hold this system's threads, connections, queues, or quorum waits? | `references/routes/q6-control.md` |
+| Q7 Fidelity | Does a safety, capacity, or recovery claim rest on a mock, emulator, simulator, benchmark, lab substrate, a proxy metric or release gate (test-suite status, health check, offline reward), or a rehearsal smaller than the real event, or on a capacity, fault, or timing assumption never calibrated against deployment data? | `references/routes/q7-fidelity.md` |
+| Q8 Diagnosability | Is the task a production diagnosis, an observability or forensics design, or does the change alter the evidence (effective configuration, version, generation, provenance, comparator) a responder would need to separate competing causes? | `references/routes/q8-diagnosability.md` |
 
-Common selection is two to four questions. A controller platform may need all seven; a one-host
-stateful migration may need only Q2/Q3/Q5. A small CRUD service with one cache does not justify the
-whole protocol: select only the question whose answer can change the decision.
+Common selection is two to four questions. A controller platform may need most of them; a
+one-host stateful change may need only Q3/Q5; a small service whose only risk is one derived view
+needs one question answered in a paragraph. If no trigger is yes, say so in one line and answer the
+task without this protocol.
 
 ## Review method
 
-### 1. Map change, state, and seams
+### 1. Map only what the selected questions need
 
-List only what exists:
-
-1. intent sources;
-2. authoritative state and derived views;
-3. mutating and recovery transitions;
-4. internal/external seams and semantic owners;
-5. controllers, actuators, and fault domains;
-6. invariants and behavioral oracles;
-7. test surrogates and calibration evidence.
-
-For a repository, cite files, functions, and configuration paths. For a proposal, keep missing facts
-as unknowns rather than filling them with a fashionable pattern.
+Intent sources; authoritative state and derived views; mutating and recovery transitions; seams and
+their semantic owners; controllers, actuators, and fault domains; invariants and oracles; test
+surrogates and calibration evidence. For a repository, cite files, functions, and configuration
+paths. For a proposal, keep missing facts as unknowns rather than filling them with a fashionable
+pattern.
 
 ### 2. Build risk chains
 
-For each top risk, complete this chain:
+For each top risk, complete the chain and rank by consequence, reachability, observability, and
+recoverability. A silent, catastrophic, or irreversible risk outranks a frequent clean failure.
+Every recommendation must change at least one state boundary, transition, oracle, recovery path, or
+acceptance decision; otherwise drop it.
 
-`trigger/state → consequence/invariant → prevention → behavioral oracle → recovery → falsifiable acceptance`
-
-Rank by consequence, reachability, observability, and recoverability. A silent, catastrophic, or
-irreversible risk outranks a frequent clean failure. Every recommendation must change at least one
-state boundary, transition, oracle, recovery path, or acceptance decision.
-
-Use this compact table:
-
-| Risk / principle | Trigger and consequence | Prevention | Oracle | Recovery | Acceptance | Provenance |
-|---|---|---|---|---|---|---|
+```text
+Risk: <name>  (<question>, <principle>)
+Trigger → consequence: <state or input> → <violated invariant or harm>
+Prevention: <boundary, fence, contract, or bound that removes the trigger>
+Oracle: <externally observable behavior or relation that fails when the risk fires>
+Recovery: <path that restores safety without worsening the incident>
+Acceptance: <injection or input; observation point; expected bound or relation; production guardrail>
+Provenance: <XU-DIRECT xu-0NN | XU-SYNTHESIS xu-0NN, xu-0NN | COMPANION>  (only if research changed this chain)
+```
 
 ### 3. Calibrate verification
 
 Types, runtime invariants, stateful tests, deterministic simulation, model checking, and proof are a
-ladder, not a maturity badge. Load `references/formal-verification.md` only when correctness spans
-concurrency, distributed coordination, crash recovery, conservation, or interacting loops.
-
-- Formalize the smallest high-risk protocol whose interleavings escape testing.
-- State safety, progress/stability, fairness, and fault assumptions.
-- Preserve interactions relevant to the invariant; abstract the rest.
-- Tie model actions to code through traces, mirrored actions, or runtime invariants.
-- Keep fault injection and production oracles for assumptions outside the model.
-
-Welder's controller-composition direction is `metadata-only` in this snapshot. Treat interacting
-controllers through P4/P6 and as an open composition risk; do not claim a verified Welder theorem.
+ladder, not a maturity badge. When correctness spans concurrency, distributed coordination, crash
+recovery, conservation, or interacting loops, load `references/formal-verification.md` and formalize
+only the smallest high-risk protocol whose interleavings escape testing. Keep fault injection and
+production oracles for assumptions outside any model. For an authorized agent-assisted TLA+
+investigation, use `references/specula-pilot.md` to choose a focused Lite pilot or a conformance
+workflow. A generated statechart is a starting hypothesis, not verification evidence.
 
 ### 4. Make acceptance falsifiable
 
-Specify the injection/input, observation point, expected bound or state relation, and production
-guardrail. “Add tests,” a green mock, a row change, no exception, or a model checker exit code is
-not an oracle. Preserve minimized failing traces as regressions.
+Specify the injection or input, the observation point, the expected bound or state relation, and the
+production guardrail. "Add tests", a green mock, a row change, no exception, or a model-checker exit
+code is not an oracle. Preserve minimized failing traces as regressions.
 
 ## Conditional references
 
-Load paper-level material only when attribution is needed:
+Load paper-level material only when the user asks for attribution, a research claim is contested,
+or a specific technique is needed. A review that selects Q8 for a diagnosis does not need
+`principles.md` or `research-map.md`; the route file is the working reference.
 
-- complete inventory and depth: `references/paper-ledger.md`;
-- synthesis evidence and exact claim corrections: `references/research-map.md`;
+- synthesis evidence, audited numbers, corpus boundary, exact claim corrections:
+  `references/research-map.md`;
+- complete 97-entry inventory and audit depth: `references/paper-ledger.md`;
+- principle text with evidence anchors, examples, and counterexamples: `references/principles.md`;
 - Xu tools and their limits: `references/tools.md`;
 - full worked reviews: `references/examples.md`;
-- additional reusable probes: `references/checklists.md`;
-- capacity/overload/readiness beyond the Xu corpus: `references/large-system-gate.md`
+- recurring bug shapes and long-form probes: `references/checklists.md`;
+- capacity, overload, and readiness beyond the Xu corpus: `references/large-system-gate.md`
   (`COMPANION`, optional, risk-calibrated).
 
-For live degradation or diagnosis, always select Q7 and require effective configuration/version,
-cross-layer relationships, a healthy comparator or relational oracle, and collection affordable
-enough to run during the incident. Do not reduce diagnosability to “add logs.”
+## Output
 
-## Required output
+For **Review**:
 
-When this skill materially changes the review, return:
+1. reliability verdict and the scope actually inspected;
+2. selected questions, each with the yes-trigger that selected it, plus unresolved high-impact
+   unknowns;
+3. ranked risk chains in the block format above, with executable acceptance.
 
-1. reliability verdict and inspected scope;
-2. selected questions and unresolved high-impact unknowns;
-3. compact change/state/seam map when relationships need it;
-4. ranked risk chains with provenance;
-5. executable acceptance and production guardrails;
-6. residual risks, model/fidelity limits, and liveness assumptions;
-7. paper IDs and evidence labels only where research changes a decision.
+Only when it changes a decision: a compact change/state/seam map; residual risks, fidelity limits,
+and liveness assumptions; paper IDs and evidence labels.
 
-Keep the response proportional. Never dump all fourteen principles, seven questions, or 97 papers
-when a smaller route answers the design question.
+For **Investigate**, deliver the source/tool identities, scope and bounds, selected risk chains,
+actual checker outcomes, code-level reproductions, controls, cleanup, and unresolved candidates.
+Separate model violations from reproduced defects and documented limitations; state whether
+implementation trace validation ran. For **Explain**, answer the question without review blocks.
+
+Length follows the number of selected questions, not the protocol. Never emit all eight questions,
+all fourteen principles, or a paper list when a smaller route answers the design question.

@@ -118,6 +118,20 @@ Use at least one, preferably two independent links:
 Re-run conformance when relevant code/state/action mapping changes. A spec with no owner or drift
 gate is explanatory documentation, not verification evidence.
 
+## Agent-assisted execution (`COMPANION`)
+
+When a pilot is authorized, read [specula-pilot.md](specula-pilot.md). Start with
+the smallest code-backed protocol and TLC; add another checker or proof system only
+when the required property and assurance scope justify it. Specula Lite supplies a
+single-agent modeling/checking/reproduction workflow, but explicitly omits implementation
+trace validation. Preserve that limit even when its finite checks are clean.
+
+For job ownership, distinguish runner exclusion, attempt identity, live descendants,
+durable completion, and the actual authority to write. A runner's death or a timeout
+receipt does not establish descendant termination. A PID/epoch recorded in metadata
+does not fence a write unless the protected sink enforces it. Exercise the restart
+boundary and observe the shared output, including a control where cleanup succeeds.
+
 ## ESR: progress plus stability (`XU-DIRECT`)
 
 For a controller with desired description `d` and actual-state predicate `match(d)`, Anvil's ESR

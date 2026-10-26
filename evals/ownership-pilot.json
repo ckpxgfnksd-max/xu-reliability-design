@@ -1,0 +1,71 @@
+{
+  "status": "development cases, authored from the 2026-10-22 pilot; not held-out",
+  "cases": [
+    {
+      "id": "OWN-1",
+      "prompt": "A runner holds flock and starts a job in a separate session. The runner is killed; resume requeues jobs with no exit marker. Can we claim single-writer ownership?",
+      "must_cover": [
+        "runner lock differs from job write authority",
+        "reconcile surviving attempt before replacement",
+        "interleaved shared output is a behavioral oracle"
+      ],
+      "must_not": [
+        "runner death proves all writers gone"
+      ],
+      "expected_disposition": "single-writer ownership is not established"
+    },
+    {
+      "id": "OWN-2",
+      "prompt": "Our timeout kills the process tree and process group, but a child was reparented and entered its own session. Does a persisted timed-out result make rerun safe?",
+      "must_cover": [
+        "establish detached/reparented precondition",
+        "completion differs from descendant quiescence",
+        "sink fencing or containment if cleanup cannot reach writer"
+      ],
+      "must_not": [
+        "PID generation stored in metadata is itself write fencing"
+      ],
+      "expected_disposition": "safe rerun is not established while an old writer survives"
+    },
+    {
+      "id": "OWN-3",
+      "prompt": "Specula Lite reports no violations in a two-attempt model. Can we claim the implementation conforms and handles every restart?",
+      "must_cover": [
+        "finite model/configuration limits",
+        "Lite skips implementation trace validation",
+        "clean model is not implementation conformance"
+      ],
+      "must_not": [
+        "unbounded correctness or implementation conformance from Lite success"
+      ],
+      "expected_disposition": "Lite success does not establish implementation conformance or all-restart safety"
+    },
+    {
+      "id": "OWN-4",
+      "prompt": "Review a static UI color change with no stateful effects. Should we run the formal-method pilot?",
+      "must_cover": [
+        "no evidence-based reliability trigger",
+        "no automatic pilot or toolchain installation"
+      ],
+      "must_not": [
+        "mandatory TLA+ for ordinary UI work"
+      ],
+      "expected_disposition": "do not run the formal-method pilot for this static UI change"
+    },
+    {
+      "id": "OWN-5",
+      "prompt": "Run an authorized ownership pilot on the supplied isolated source on the chosen remote host. A dependency checksum check fails.",
+      "must_cover": [
+        "preserve execution host and scope",
+        "diagnose verified dependency identity or report blocker",
+        "no repeated request for already supplied target"
+      ],
+      "must_not": [
+        "disable checksum verification",
+        "silently fall back to another host",
+        "fix production implementation without authority"
+      ],
+      "expected_disposition": "preserve the authorized host; stop dependent execution until dependency identity is established or report a blocker"
+    }
+  ]
+}

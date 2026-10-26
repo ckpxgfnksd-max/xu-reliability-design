@@ -1,0 +1,1534 @@
+{
+ "skill_name": "xu-reliability-design",
+ "taxonomy": "2026-09-09 eight questions (Q7 Fidelity, Q8 Diagnosability)",
+ "evals": [
+  {
+   "id": 1,
+   "case": "H1",
+   "set": "dev",
+   "boundary": false,
+   "prompt": "Add a non-null `owner_id` to a 4-TB table. Old and new binaries coexist for a week; two services write the row; backfill can restart. The rollback plan is redeploy old code.",
+   "expected_output": "See EVALS.md gold for H1",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q5"
+    ],
+    "optional": [
+     "Q7"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q6",
+     "Q8"
+    ],
+    "must_cover": [
+     "dual-writer and version semantics for the row",
+     "durable, restartable backfill cursor",
+     "old/new read and write compatibility during the coexistence week",
+     "conservation oracle for the backfill (rows in vs rows transformed)",
+     "retry/restart behavior",
+     "states that redeploying old code cannot undo transformed state and names the forward repair"
+    ],
+    "must_not": []
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q3",
+    "Selected questions include Q4",
+    "Selected questions include Q5",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: dual-writer and version semantics for the row",
+    "Covers: durable, restartable backfill cursor",
+    "Covers: old/new read and write compatibility during the coexistence week",
+    "Covers: conservation oracle for the backfill (rows in vs rows transformed)",
+    "Covers: retry/restart behavior",
+    "Covers: states that redeploying old code cannot undo transformed state and names the forward repair"
+   ]
+  },
+  {
+   "id": 2,
+   "case": "H2",
+   "set": "seen",
+   "boundary": false,
+   "prompt": "A provider retries callbacks for 72 hours. Our handler writes an order, emits a shipment event, and returns 200. A timeout may happen after either effect.",
+   "expected_output": "See EVALS.md gold for H2",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q5"
+    ],
+    "optional": [],
+    "false_positive": [
+     "Q1",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "provider/event identity for deduplication",
+     "partial-effect state machine (order written, event not emitted, and vice versa)",
+     "duplicate and late-success handling",
+     "authoritative conservation relation between orders and shipment events",
+     "compensation or manual recovery path",
+     "crash-prefix tests after each effect"
+    ],
+    "must_not": [
+     "mandates double-entry accounting without deriving the domain invariant"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q3",
+    "Selected questions include Q4",
+    "Selected questions include Q5",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: provider/event identity for deduplication",
+    "Covers: partial-effect state machine (order written, event not emitted, and vice versa)",
+    "Covers: duplicate and late-success handling",
+    "Covers: authoritative conservation relation between orders and shipment events",
+    "Covers: compensation or manual recovery path",
+    "Covers: crash-prefix tests after each effect",
+    "Does not: mandates double-entry accounting without deriving the domain invariant"
+   ],
+   "proposed_gold_changes": [
+    {
+     "question": "Q6",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5"
+     ],
+     "previous_optional": [],
+     "current_material": [
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5"
+     ],
+     "current_optional": [
+      "Q6"
+     ],
+     "rationale": "the handler waits on the event emit, so a slow-but-connected bus matches the scoped Q6 clause; acceptable only as a bounded-wait note",
+     "status": "proposed, not applied: this case was reported in the 2026-09-09 smoke round; apply before the next round starts if the content rationale still holds"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "case": "H3",
+   "set": "seen",
+   "boundary": false,
+   "prompt": "A boolean flag disables checkout in one country. Admin UI validates type; edge caches have unknown TTL and can miss invalidations.",
+   "expected_output": "See EVALS.md gold for H3",
+   "gold": {
+    "material": [
+     "Q1",
+     "Q2",
+     "Q5"
+    ],
+    "optional": [
+     "Q3"
+    ],
+    "false_positive": [
+     "Q4",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "declared vs effective flag state",
+     "generation or bounded freshness for the flag",
+     "end-to-end oracle: a real checkout request from that country",
+     "repairable rejection of unsafe intent (wrong country code, wrong scope)",
+     "tests for stale and omitted invalidation"
+    ],
+    "must_not": []
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Selected questions include Q2",
+    "Selected questions include Q5",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: declared vs effective flag state",
+    "Covers: generation or bounded freshness for the flag",
+    "Covers: end-to-end oracle: a real checkout request from that country",
+    "Covers: repairable rejection of unsafe intent (wrong country code, wrong scope)",
+    "Covers: tests for stale and omitted invalidation"
+   ]
+  },
+  {
+   "id": 4,
+   "case": "H4",
+   "set": "dev",
+   "boundary": false,
+   "prompt": "A controller changes compaction concurrency every minute from latency telemetry. Operators can override it. The value is atomically stored.",
+   "expected_output": "See EVALS.md gold for H4",
+   "gold": {
+    "material": [
+     "Q1",
+     "Q6",
+     "Q7"
+    ],
+    "optional": [
+     "Q2",
+     "Q3",
+     "Q5"
+    ],
+    "false_positive": [
+     "Q4",
+     "Q8"
+    ],
+    "must_cover": [
+     "semantic ground truth of the latency signal",
+     "stale/noisy telemetry handling",
+     "competing writers: operator override vs controller, with arbitration",
+     "step/rate/stop conditions and LKG",
+     "crash/restart: controller re-observes before acting",
+     "calibration of gains/thresholds against deployment behavior and capacity",
+     "states that atomic storage alone is weak"
+    ],
+    "must_not": []
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Selected questions include Q6",
+    "Selected questions include Q7",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: semantic ground truth of the latency signal",
+    "Covers: stale/noisy telemetry handling",
+    "Covers: competing writers: operator override vs controller, with arbitration",
+    "Covers: step/rate/stop conditions and LKG",
+    "Covers: crash/restart: controller re-observes before acting",
+    "Covers: calibration of gains/thresholds against deployment behavior and capacity",
+    "Covers: states that atomic storage alone is weak"
+   ],
+   "gold_history": [
+    {
+     "question": "Q2",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q6",
+      "Q7"
+     ],
+     "previous_optional": [],
+     "current_material": [
+      "Q1",
+      "Q3",
+      "Q6",
+      "Q7"
+     ],
+     "current_optional": [
+      "Q2"
+     ],
+     "rationale": "writer arbitration (operator override vs controller) is owned by Q6; Q2 keeps identity/staleness, which the prompt does not establish",
+     "kind": "change",
+     "recorded_on": "2026-09-09"
+    },
+    {
+     "question": "Q3",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q1",
+      "Q3",
+      "Q6",
+      "Q7"
+     ],
+     "previous_optional": [
+      "Q2"
+     ],
+     "current_material": [
+      "Q1",
+      "Q6",
+      "Q7"
+     ],
+     "current_optional": [
+      "Q2",
+      "Q3"
+     ],
+     "rationale": "no must_cover item is multi-effect workflow content; the restart item lives in the Q6 route",
+     "kind": "change",
+     "recorded_on": "2026-09-09"
+    },
+    {
+     "question": "Q5",
+     "kind": "change",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q1",
+      "Q6",
+      "Q7"
+     ],
+     "previous_optional": [
+      "Q2",
+      "Q3"
+     ],
+     "current_material": [
+      "Q1",
+      "Q6",
+      "Q7"
+     ],
+     "current_optional": [
+      "Q2",
+      "Q3",
+      "Q5"
+     ],
+     "rationale": "the Q5 trigger's reconciliation clause can read as yes for a telemetry-driven controller even though Q6 owns that loop; acceptable optional for an ESR-style progress statement",
+     "recorded_on": "2026-09-09"
+    }
+   ],
+   "must_cover_history": [
+    {
+     "previous_must_cover": [
+      "semantic ground truth",
+      "stale/noisy telemetry",
+      "competing writers",
+      "step/rate/stop/LKG",
+      "crash/restart",
+      "behavioral/capacity calibration",
+      "atomic storage alone is weak"
+     ],
+     "effective_from": "2026-09-10",
+     "rationale": "'crash/restart' sharpened to 'crash/restart: controller re-observes before acting' when the H4 miss was fed back into q6; dated 2026-09-10 because the case was reported in the 2026-09-09 round, so --as-of 2026-09-09 replays the 2026-09-01 wording and the scorer warns",
+     "current_must_cover": [
+      "semantic ground truth of the latency signal",
+      "stale/noisy telemetry handling",
+      "competing writers: operator override vs controller, with arbitration",
+      "step/rate/stop conditions and LKG",
+      "crash/restart: controller re-observes before acting",
+      "calibration of gains/thresholds against deployment behavior and capacity",
+      "states that atomic storage alone is weak"
+     ],
+     "recorded_on": "2026-09-09"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "case": "H5",
+   "set": "seen",
+   "boundary": false,
+   "prompt": "Only one customer cohort sees 3-second pauses. Aggregate latency is normal; logs record request timeout but not resolver path or config generation.",
+   "expected_output": "See EVALS.md gold for H5",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q4",
+     "Q8"
+    ],
+    "optional": [],
+    "false_positive": [
+     "Q1",
+     "Q3",
+     "Q5",
+     "Q6",
+     "Q7"
+    ],
+    "must_cover": [
+     "affordable cross-layer/relational evidence design",
+     "effective config/version recorded per request or cohort",
+     "cohort comparator (affected vs healthy)",
+     "resolver/dependency outcomes recorded",
+     "a test or query that separates at least two plausible causes"
+    ],
+    "must_not": [
+     "turns the task into a mutation/recovery review",
+     "proposes a rollback or TNR mechanism"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q4",
+    "Selected questions include Q8",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: affordable cross-layer/relational evidence design",
+    "Covers: effective config/version recorded per request or cohort",
+    "Covers: cohort comparator (affected vs healthy)",
+    "Covers: resolver/dependency outcomes recorded",
+    "Covers: a test or query that separates at least two plausible causes",
+    "Does not: turns the task into a mutation/recovery review",
+    "Does not: proposes a rollback or TNR mechanism"
+   ],
+   "gold_history": [
+    {
+     "question": "Q7->Q8",
+     "effective_from": "2026-09-09",
+     "previous_material": [
+      "Q2",
+      "Q4",
+      "Q7"
+     ],
+     "previous_optional": [],
+     "current_material": [
+      "Q2",
+      "Q4",
+      "Q8"
+     ],
+     "current_optional": [],
+     "rationale": "taxonomy relabel only: diagnosability content moved from Q7 to Q8; no question demoted",
+     "kind": "relabel",
+     "recorded_on": "2026-09-09"
+    }
+   ],
+   "proposed_gold_changes": [
+    {
+     "question": "Q2",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q2",
+      "Q4",
+      "Q8"
+     ],
+     "previous_optional": [],
+     "current_material": [
+      "Q4",
+      "Q8"
+     ],
+     "current_optional": [
+      "Q2"
+     ],
+     "rationale": "the prompt does not establish a resolver-cache authority problem; no must_cover item is Q2 content",
+     "status": "proposed, not applied: this case was reported in the 2026-09-09 smoke round; apply before the next round starts if the content rationale still holds"
+    },
+    {
+     "question": "Q4",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q4",
+      "Q8"
+     ],
+     "previous_optional": [
+      "Q2"
+     ],
+     "current_material": [
+      "Q8"
+     ],
+     "current_optional": [
+      "Q2",
+      "Q4"
+     ],
+     "rationale": "every must_cover item is Q8 content; Q4 remains acceptable for the cross-layer contract",
+     "status": "proposed, not applied: this case was reported in the 2026-09-09 smoke round; apply before the next round starts if the content rationale still holds"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "case": "H6",
+   "set": "dev",
+   "boundary": false,
+   "prompt": "Plugins are verified bytecode, but safe source programs are often rejected. Teams use an unsafe host-call helper to ship on time.",
+   "expected_output": "See EVALS.md gold for H6",
+   "gold": {
+    "material": [
+     "Q1",
+     "Q4",
+     "Q5"
+    ],
+    "optional": [
+     "Q6",
+     "Q7"
+    ],
+    "false_positive": [
+     "Q2",
+     "Q3",
+     "Q8"
+    ],
+    "must_cover": [
+     "false rejection and the workaround treated as an assurance risk",
+     "source/compiler/verifier/runtime contract map",
+     "narrowing of the unsafe boundary with owners and negative tests",
+     "tests for safe expressiveness",
+     "tests for runtime containment"
+    ],
+    "must_not": []
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Selected questions include Q4",
+    "Selected questions include Q5",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: false rejection and the workaround treated as an assurance risk",
+    "Covers: source/compiler/verifier/runtime contract map",
+    "Covers: narrowing of the unsafe boundary with owners and negative tests",
+    "Covers: tests for safe expressiveness",
+    "Covers: tests for runtime containment"
+   ],
+   "gold_history": [
+    {
+     "question": "Q6",
+     "kind": "change",
+     "recorded_on": "2026-09-09",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q1",
+      "Q4",
+      "Q5"
+     ],
+     "previous_optional": [
+      "Q7"
+     ],
+     "current_material": [
+      "Q1",
+      "Q4",
+      "Q5"
+     ],
+     "current_optional": [
+      "Q6",
+      "Q7"
+     ],
+     "rationale": "must_cover 'tests for runtime containment' is blast-radius content that examples.md routes to Q6; acceptable optional"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "case": "H7",
+   "set": "seen",
+   "boundary": false,
+   "prompt": "Nightly backups report success. Restore was last attempted 18 months ago; credentials and encryption keys have since changed. Testing on production data is prohibited.",
+   "expected_output": "See EVALS.md gold for H7",
+   "gold": {
+    "material": [
+     "Q1",
+     "Q3",
+     "Q5",
+     "Q7"
+    ],
+    "optional": [],
+    "false_positive": [
+     "Q2",
+     "Q4",
+     "Q6",
+     "Q8"
+    ],
+    "must_cover": [
+     "safe representative or redacted data",
+     "real restore identity and key path exercised",
+     "durable restore stages",
+     "integrity/behavior oracle for the restored data",
+     "risk-calibrated rehearsal cadence",
+     "recovery claim narrowed to the evidenced radius"
+    ],
+    "must_not": [
+     "insists on raw production data",
+     "demands continuous production restores"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Selected questions include Q3",
+    "Selected questions include Q5",
+    "Selected questions include Q7",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: safe representative or redacted data",
+    "Covers: real restore identity and key path exercised",
+    "Covers: durable restore stages",
+    "Covers: integrity/behavior oracle for the restored data",
+    "Covers: risk-calibrated rehearsal cadence",
+    "Covers: recovery claim narrowed to the evidenced radius",
+    "Does not: insists on raw production data",
+    "Does not: demands continuous production restores"
+   ]
+  },
+  {
+   "id": 8,
+   "case": "H8",
+   "set": "seen",
+   "boundary": false,
+   "prompt": "A support role gains a new regional action. CI diffs policy text; five gateways cache decisions independently. Denial messages cause operators to request admin.",
+   "expected_output": "See EVALS.md gold for H8",
+   "gold": {
+    "material": [
+     "Q1",
+     "Q2",
+     "Q5",
+     "Q7"
+    ],
+    "optional": [
+     "Q3",
+     "Q8"
+    ],
+    "false_positive": [
+     "Q4",
+     "Q6"
+    ],
+    "must_cover": [
+     "before/after effective-decision comparison with production code/data",
+     "explains every new allow and material new deny",
+     "cache convergence and replay tests across the five gateways",
+     "policy provenance preserved",
+     "denial feedback improved without over-grant"
+    ],
+    "must_not": []
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Selected questions include Q2",
+    "Selected questions include Q5",
+    "Selected questions include Q7",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: before/after effective-decision comparison with production code/data",
+    "Covers: explains every new allow and material new deny",
+    "Covers: cache convergence and replay tests across the five gateways",
+    "Covers: policy provenance preserved",
+    "Covers: denial feedback improved without over-grant"
+   ],
+   "gold_history": [
+    {
+     "question": "Q8",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q1",
+      "Q2",
+      "Q5",
+      "Q7"
+     ],
+     "previous_optional": [
+      "Q3"
+     ],
+     "current_material": [
+      "Q1",
+      "Q2",
+      "Q5",
+      "Q7"
+     ],
+     "current_optional": [
+      "Q3",
+      "Q8"
+     ],
+     "rationale": "policy provenance is Q8 content, acceptable optional (a content change, so not a relabel; H8 was not reported in the 2026-09-09 round). Q7 stays material because the CI policy-text diff is a surrogate for effective decisions",
+     "recorded_on": "2026-09-09",
+     "kind": "change"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "case": "H9",
+   "set": "dev",
+   "boundary": false,
+   "prompt": "A device-management service pushes firmware intent over unreliable mobile links. Devices may reconnect weeks later with old desired state and repeat acknowledgements.",
+   "expected_output": "See EVALS.md gold for H9",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q6"
+    ],
+    "optional": [
+     "Q7"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q5",
+     "Q8"
+    ],
+    "must_cover": [
+     "generation/authority for desired state",
+     "late and replayed messages handled",
+     "resumable device-side transition",
+     "version compatibility across old and new firmware",
+     "partial success across the fleet",
+     "bounded server retry and backlog with a stated behavior at the bound",
+     "effective firmware behavior as the oracle"
+    ],
+    "must_not": []
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q3",
+    "Selected questions include Q4",
+    "Selected questions include Q6",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: generation/authority for desired state",
+    "Covers: late and replayed messages handled",
+    "Covers: resumable device-side transition",
+    "Covers: version compatibility across old and new firmware",
+    "Covers: partial success across the fleet",
+    "Covers: bounded server retry and backlog with a stated behavior at the bound",
+    "Covers: effective firmware behavior as the oracle"
+   ],
+   "proposed_gold_changes": [
+    {
+     "question": "Q5",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q6"
+     ],
+     "previous_optional": [
+      "Q7"
+     ],
+     "current_material": [
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q6"
+     ],
+     "current_optional": [
+      "Q5",
+      "Q7"
+     ],
+     "rationale": "must_cover requires 'effective firmware behavior as the oracle', which is Q5 content; scoring Q5 as a false positive contradicted the gold",
+     "status": "proposed, not applied: this case was reported in the 2026-09-09 smoke round; apply before the next round starts if the content rationale still holds"
+    }
+   ],
+   "must_cover_history": [
+    {
+     "previous_must_cover": [
+      "generation/authority",
+      "late/replayed messages",
+      "resumable device transition",
+      "version compatibility",
+      "partial success",
+      "bounded server retry/backlog",
+      "effective firmware behavior"
+     ],
+     "effective_from": "2026-09-10",
+     "rationale": "'bounded server retry/backlog' sharpened to add 'with a stated behavior at the bound' when the H9 miss was fed back into q6; dated 2026-09-10 because the case was reported in the 2026-09-09 round, so --as-of 2026-09-09 replays the 2026-09-01 wording and the scorer warns",
+     "current_must_cover": [
+      "generation/authority for desired state",
+      "late and replayed messages handled",
+      "resumable device-side transition",
+      "version compatibility across old and new firmware",
+      "partial success across the fleet",
+      "bounded server retry and backlog with a stated behavior at the bound",
+      "effective firmware behavior as the oracle"
+     ],
+     "recorded_on": "2026-09-09"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "case": "H10",
+   "set": "seen",
+   "boundary": false,
+   "prompt": "A learned autoscaler is trained in a simulator and moves 20% traffic per decision. Offline reward is high; two manual traffic tools also exist.",
+   "expected_output": "See EVALS.md gold for H10",
+   "gold": {
+    "material": [
+     "Q4",
+     "Q6",
+     "Q7"
+    ],
+    "optional": [
+     "Q5"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q2",
+     "Q3",
+     "Q8"
+    ],
+    "must_cover": [
+     "shared actuator arbitration with the manual tools",
+     "hard capacity and radius bounds",
+     "stop condition and LKG",
+     "simulator decision-fidelity calibration against production",
+     "correlated faults",
+     "canary or production guardrail"
+    ],
+    "must_not": [
+     "bans learning",
+     "requires formal proof by default"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q4",
+    "Selected questions include Q6",
+    "Selected questions include Q7",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: shared actuator arbitration with the manual tools",
+    "Covers: hard capacity and radius bounds",
+    "Covers: stop condition and LKG",
+    "Covers: simulator decision-fidelity calibration against production",
+    "Covers: correlated faults",
+    "Covers: canary or production guardrail",
+    "Does not: bans learning",
+    "Does not: requires formal proof by default"
+   ],
+   "gold_history": [
+    {
+     "question": "Q5",
+     "kind": "change",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q4",
+      "Q6",
+      "Q7"
+     ],
+     "previous_optional": [],
+     "current_material": [
+      "Q4",
+      "Q6",
+      "Q7"
+     ],
+     "current_optional": [
+      "Q5"
+     ],
+     "rationale": "same reasoning as H4: a learned autoscaler is a feedback controller (Q6); Q5 acceptable optional for a stability statement",
+     "recorded_on": "2026-09-09"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "case": "B1",
+   "set": "dev",
+   "boundary": true,
+   "prompt": "Review a five-endpoint internal CRUD service. One process owns Postgres; Redis caches reads for 30 seconds. Deploys are ordinary rolling restarts.",
+   "expected_output": "See EVALS.md gold for B1",
+   "gold": {
+    "material": [
+     "Q2"
+    ],
+    "optional": [
+     "Q4",
+     "Q5"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q3",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "names cache authority and staleness (30 s bound, invalidation on write)",
+     "stays compact"
+    ],
+    "must_not": [
+     "emits the full multi-question protocol",
+     "proposes TNR, controller envelope, or formal model"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: names cache authority and staleness (30 s bound, invalidation on write)",
+    "Covers: stays compact",
+    "Does not: emits the full multi-question protocol",
+    "Does not: proposes TNR, controller envelope, or formal model"
+   ],
+   "proposed_gold_changes": [
+    {
+     "question": "Q6",
+     "effective_from": "2026-09-10",
+     "previous_material": [
+      "Q2"
+     ],
+     "previous_optional": [
+      "Q4",
+      "Q5"
+     ],
+     "current_material": [
+      "Q2"
+     ],
+     "current_optional": [
+      "Q4",
+      "Q5",
+      "Q6"
+     ],
+     "rationale": "the Q6 trigger now includes a slow-but-connected dependency on a caller-waited path; acceptable only as one paragraph on timeouts or bulkheads",
+     "status": "proposed, not applied: this case was reported in the 2026-09-09 smoke round; apply before the next round starts if the content rationale still holds"
+    }
+   ],
+   "must_cover_history": [
+    {
+     "previous_must_cover": [
+      "names cache-authority/staleness",
+      "does not emit a seven-question protocol"
+     ],
+     "effective_from": "2026-09-10",
+     "rationale": "wording detailed (30 s bound, invalidation on write; stays compact); same items; dated 2026-09-10 because the case was reported in the 2026-09-09 round, so --as-of 2026-09-09 replays the 2026-09-01 wording and the scorer warns",
+     "current_must_cover": [
+      "names cache authority and staleness (30 s bound, invalidation on write)",
+      "stays compact"
+     ],
+     "recorded_on": "2026-09-09"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "case": "B2",
+   "set": "dev",
+   "boundary": true,
+   "prompt": "A desktop app adds one indexed column to local SQLite. One process, no network, and the installer can be killed.",
+   "expected_output": "See EVALS.md gold for B2",
+   "gold": {
+    "material": [
+     "Q3",
+     "Q5"
+    ],
+    "optional": [
+     "Q2"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q4",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "transactional/atomic migration with restart behavior",
+     "old-version compatibility: old binary opens a migrated or half-migrated file safely or refuses explicitly",
+     "compact"
+    ],
+    "must_not": [
+     "distributed-systems treatise",
+     "proposes controllers, blast radius, or TNR"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q3",
+    "Selected questions include Q5",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: transactional/atomic migration with restart behavior",
+    "Covers: old-version compatibility: old binary opens a migrated or half-migrated file safely or refuses explicitly",
+    "Covers: compact",
+    "Does not: distributed-systems treatise",
+    "Does not: proposes controllers, blast radius, or TNR"
+   ],
+   "must_cover_history": [
+    {
+     "previous_must_cover": [
+      "compact transaction/restart review",
+      "old-version compatibility",
+      "not a distributed-systems treatise"
+     ],
+     "effective_from": "2026-09-10",
+     "rationale": "'old-version compatibility' sharpened to 'old binary opens a migrated or half-migrated file safely or refuses explicitly' when the B2 miss was fed back into q3; dated 2026-09-10 because the case was reported in the 2026-09-09 round, so --as-of 2026-09-09 replays the 2026-09-01 wording and the scorer warns",
+     "current_must_cover": [
+      "transactional/atomic migration with restart behavior",
+      "old-version compatibility: old binary opens a migrated or half-migrated file safely or refuses explicitly",
+      "compact"
+     ],
+     "recorded_on": "2026-09-09"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "case": "B3",
+   "set": "dev",
+   "boundary": true,
+   "prompt": "A CLI reads a YAML file and prints suggestions. It cannot write files or call production. False positives waste developer time.",
+   "expected_output": "See EVALS.md gold for B3",
+   "gold": {
+    "material": [
+     "Q1"
+    ],
+    "optional": [],
+    "false_positive": [
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q5",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "semantic validation beyond syntax",
+     "usable, repairable feedback; false-positive cost addressed"
+    ],
+    "must_not": [
+     "demands rollback, TNR, controller arbitration, blast radius, or production recovery"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: semantic validation beyond syntax",
+    "Covers: usable, repairable feedback; false-positive cost addressed",
+    "Does not: demands rollback, TNR, controller arbitration, blast radius, or production recovery"
+   ]
+  },
+  {
+   "id": 14,
+   "case": "B4",
+   "set": "seen",
+   "boundary": true,
+   "prompt": "A local command converts Markdown headings to sentence case and writes a new output file; the original stays untouched.",
+   "expected_output": "See EVALS.md gold for B4",
+   "gold": {
+    "material": [],
+    "optional": [],
+    "false_positive": [
+     "Q1",
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q5",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "answers the task normally without the reliability protocol"
+    ],
+    "must_not": [
+     "invokes the reliability protocol"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "States that no reliability question is material and answers the task normally",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: answers the task normally without the reliability protocol",
+    "Does not: invokes the reliability protocol"
+   ]
+  },
+  {
+   "id": 15,
+   "case": "B5",
+   "set": "seen",
+   "boundary": true,
+   "prompt": "Design a dashboard to help distinguish application slowdown from storage slowdown. It has read-only access to metrics and traces.",
+   "expected_output": "See EVALS.md gold for B5",
+   "gold": {
+    "material": [
+     "Q8"
+    ],
+    "optional": [
+     "Q2",
+     "Q4"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q3",
+     "Q5",
+     "Q6",
+     "Q7"
+    ],
+    "must_cover": [
+     "evidence relations that separate application vs storage slowdown",
+     "comparator design (healthy vs affected)"
+    ],
+    "must_not": [
+     "mutation state machine, rollback, TNR, or controller safety envelope"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q8",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: evidence relations that separate application vs storage slowdown",
+    "Covers: comparator design (healthy vs affected)",
+    "Does not: mutation state machine, rollback, TNR, or controller safety envelope"
+   ],
+   "gold_history": [
+    {
+     "question": "Q7->Q8",
+     "effective_from": "2026-09-09",
+     "previous_material": [
+      "Q7"
+     ],
+     "previous_optional": [
+      "Q2",
+      "Q4"
+     ],
+     "current_material": [
+      "Q8"
+     ],
+     "current_optional": [
+      "Q2",
+      "Q4"
+     ],
+     "rationale": "taxonomy change: 'Q7 with P12 diagnosability' is Q8 under the eight-question taxonomy",
+     "kind": "relabel",
+     "recorded_on": "2026-09-09"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "case": "B6",
+   "set": "seen",
+   "boundary": true,
+   "prompt": "Write a notebook that compares two queueing formulas on synthetic data. It makes no claim about a deployed service.",
+   "expected_output": "See EVALS.md gold for B6",
+   "gold": {
+    "material": [],
+    "optional": [],
+    "false_positive": [
+     "Q1",
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q5",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "answers the task normally without the reliability protocol"
+    ],
+    "must_not": [
+     "preemptively runs the full skill"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "States that no reliability question is material and answers the task normally",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: answers the task normally without the reliability protocol",
+    "Does not: preemptively runs the full skill"
+   ]
+  },
+  {
+   "id": 17,
+   "case": "N1",
+   "set": "heldout",
+   "boundary": false,
+   "prompt": "Logging a user out must make their session unusable everywhere within 60 seconds. Sessions are signed tokens that 12 edge services validate locally. A revocation list is pushed over a message bus; each edge caches it with a five-minute TTL and re-fetches on a miss.",
+   "expected_output": "See EVALS.md gold for N1",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q5"
+    ],
+    "optional": [
+     "Q4"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q3",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "exposes the conflict between the 60-second claim and the five-minute cache",
+     "declared vs effective revocation",
+     "oracle: a real request through every edge",
+     "tests for bus omission, replay, and a token issued just before revocation"
+    ],
+    "must_not": [
+     "demands a controller envelope, TNR, or a formal model"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q5",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: exposes the conflict between the 60-second claim and the five-minute cache",
+    "Covers: declared vs effective revocation",
+    "Covers: oracle: a real request through every edge",
+    "Covers: tests for bus omission, replay, and a token issued just before revocation",
+    "Does not: demands a controller envelope, TNR, or a formal model"
+   ],
+   "proposed_gold_changes": [
+    {
+     "question": "Q6",
+     "effective_from": "tbd",
+     "previous_material": [
+      "Q2",
+      "Q5"
+     ],
+     "previous_optional": [
+      "Q4"
+     ],
+     "current_material": [
+      "Q2",
+      "Q5"
+     ],
+     "current_optional": [
+      "Q4",
+      "Q6"
+     ],
+     "rationale": "edges re-fetch on a miss from the revocation service, a caller-waited dependency; content argument, but the shipped Q6 trigger also fires on it, so this is a trigger-vs-gold tension for an independently authored set to settle",
+     "status": "proposed, not applied: N-cases are held-out; applying this moves the case to Dev and requires an authored replacement"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "case": "N2",
+   "set": "heldout",
+   "boundary": false,
+   "prompt": "A cron job runs at 02:00, reads `last_processed_at` from a table, aggregates events newer than it, writes the aggregates, then advances the cursor. A slow run can overlap the next one. The job exits 0 when the upstream event table is empty.",
+   "expected_output": "See EVALS.md gold for N2",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q3",
+     "Q5"
+    ],
+    "optional": [
+     "Q8"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q4",
+     "Q6",
+     "Q7"
+    ],
+    "must_cover": [
+     "cursor as a checkpoint with two possible writers (overlapping runs)",
+     "write-then-advance as an interruptible multi-effect transition",
+     "exit-0-on-empty as fired-but-not-finished; a progress/conservation oracle (events in vs aggregated)",
+     "idempotent reprocessing"
+    ],
+    "must_not": [
+     "demands a controller envelope or capacity gate"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q3",
+    "Selected questions include Q5",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: cursor as a checkpoint with two possible writers (overlapping runs)",
+    "Covers: write-then-advance as an interruptible multi-effect transition",
+    "Covers: exit-0-on-empty as fired-but-not-finished; a progress/conservation oracle (events in vs aggregated)",
+    "Covers: idempotent reprocessing",
+    "Does not: demands a controller envelope or capacity gate"
+   ]
+  },
+  {
+   "id": 19,
+   "case": "N3",
+   "set": "heldout",
+   "boundary": false,
+   "prompt": "A bot merges dependency-update pull requests automatically when CI reports green. CI runs unit tests; integration suites are skipped when the Docker daemon is unavailable, and skipped suites report as passed.",
+   "expected_output": "See EVALS.md gold for N3",
+   "gold": {
+    "material": [
+     "Q1",
+     "Q7"
+    ],
+    "optional": [
+     "Q5",
+     "Q6"
+    ],
+    "false_positive": [
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q8"
+    ],
+    "must_cover": [
+     "green treated as a surrogate with a known discrepancy (skipped counts as passed)",
+     "deterministic gate distinguishing pass, fail, skipped",
+     "bound on what may be auto-merged",
+     "repairable rejection"
+    ],
+    "must_not": [
+     "demands a multi-step state machine for a single merge",
+     "bans automation"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q1",
+    "Selected questions include Q7",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: green treated as a surrogate with a known discrepancy (skipped counts as passed)",
+    "Covers: deterministic gate distinguishing pass, fail, skipped",
+    "Covers: bound on what may be auto-merged",
+    "Covers: repairable rejection",
+    "Does not: demands a multi-step state machine for a single merge",
+    "Does not: bans automation"
+   ]
+  },
+  {
+   "id": 20,
+   "case": "N4",
+   "set": "heldout",
+   "boundary": false,
+   "prompt": "A database proxy routes read queries to the replica reporting the lowest replication lag. Each replica reports its own lag every ten seconds. When every replica reports more than 30 seconds of lag, all reads go to the primary.",
+   "expected_output": "See EVALS.md gold for N4",
+   "gold": {
+    "material": [
+     "Q2",
+     "Q6"
+    ],
+    "optional": [
+     "Q5"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q3",
+     "Q4",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "lag as a stale self-report",
+     "all-to-primary as an unbounded traffic move; hysteresis, step, capacity bounds",
+     "replica slow yet reporting low lag; reports stop arriving",
+     "goodput and recovery observation"
+    ],
+    "must_not": [
+     "demands a formal model or TNR"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q2",
+    "Selected questions include Q6",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: lag as a stale self-report",
+    "Covers: all-to-primary as an unbounded traffic move; hysteresis, step, capacity bounds",
+    "Covers: replica slow yet reporting low lag; reports stop arriving",
+    "Covers: goodput and recovery observation",
+    "Does not: demands a formal model or TNR"
+   ],
+   "proposed_gold_changes": [
+    {
+     "question": "Q7",
+     "effective_from": "tbd",
+     "previous_material": [
+      "Q2",
+      "Q6"
+     ],
+     "previous_optional": [
+      "Q5"
+     ],
+     "current_material": [
+      "Q2",
+      "Q6"
+     ],
+     "current_optional": [
+      "Q5",
+      "Q7"
+     ],
+     "rationale": "the 30-second lag threshold and primary capacity are uncalibrated assumptions",
+     "status": "proposed, not applied: N-cases are held-out; applying this moves the case to Dev and requires an authored replacement"
+    },
+    {
+     "question": "Q2",
+     "effective_from": "tbd",
+     "previous_material": [
+      "Q2",
+      "Q6"
+     ],
+     "previous_optional": [
+      "Q5",
+      "Q7"
+     ],
+     "current_material": [
+      "Q6"
+     ],
+     "current_optional": [
+      "Q2",
+      "Q5",
+      "Q7"
+     ],
+     "rationale": "the lag self-report is telemetry feeding an automated router, which the route text assigns to Q6; known tension with the current gold",
+     "status": "proposed, not applied: N-cases are held-out; applying this moves the case to Dev and requires an authored replacement"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "case": "N5",
+   "set": "heldout",
+   "boundary": true,
+   "prompt": "Write a script that renames the image files in a folder to a date-based scheme from their EXIF data, writing the renamed copies to a new folder and leaving the originals untouched.",
+   "expected_output": "See EVALS.md gold for N5",
+   "gold": {
+    "material": [],
+    "optional": [],
+    "false_positive": [
+     "Q1",
+     "Q2",
+     "Q3",
+     "Q4",
+     "Q5",
+     "Q6",
+     "Q7",
+     "Q8"
+    ],
+    "must_cover": [
+     "answers the task normally without the reliability protocol"
+    ],
+    "must_not": [
+     "invokes the reliability protocol"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "States that no reliability question is material and answers the task normally",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q4 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q7 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q8 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: answers the task normally without the reliability protocol",
+    "Does not: invokes the reliability protocol"
+   ]
+  },
+  {
+   "id": 22,
+   "case": "N6",
+   "set": "heldout",
+   "boundary": false,
+   "prompt": "After a kernel upgrade rolled out to one availability zone, p99 write latency doubled there only. Metrics are per service with no per-host or per-zone breakdown. The upgrade also changed the default I/O scheduler.",
+   "expected_output": "See EVALS.md gold for N6",
+   "gold": {
+    "material": [
+     "Q8"
+    ],
+    "optional": [
+     "Q4",
+     "Q7"
+    ],
+    "false_positive": [
+     "Q1",
+     "Q2",
+     "Q3",
+     "Q5",
+     "Q6"
+    ],
+    "must_cover": [
+     "zone and host comparator",
+     "per-host effective kernel version and scheduler joined to latency",
+     "query or experiment separating scheduler change vs kernel change vs coincident deploy",
+     "affordable collection"
+    ],
+    "must_not": [
+     "turns the task into a rollout or recovery review"
+    ]
+   },
+   "files": [],
+   "expectations": [
+    "Selected questions include Q8",
+    "Does not select Q1 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q2 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q3 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q5 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Does not select Q6 (strict; a judge may record a justified_fp with a prompt quote as advisory only)",
+    "Covers: zone and host comparator",
+    "Covers: per-host effective kernel version and scheduler joined to latency",
+    "Covers: query or experiment separating scheduler change vs kernel change vs coincident deploy",
+    "Covers: affordable collection",
+    "Does not: turns the task into a rollout or recovery review"
+   ]
+  }
+ ],
+ "partition_rule": "material + optional + false_positive = Q1..Q8 for every case; unlisted questions are false positives",
+ "label_map": {
+  "seven-question responses": "when gold Q8 is material, a selected Q7 also satisfies Q8 and leaves the false-positive set unless Q7 is itself material or optional; when gold Q8 is optional, a selected Q7 is untallied (neither TP nor FP); otherwise labels are scored as written. No-skill responses get no map. Applied mechanically by evals/aggregate.py."
+ },
+ "authority": "This file is the authoritative gold set; the case list in EVALS.md is a rendered view of it. Routing precision/recall are computed by evals/aggregate.py, never by the judge.",
+ "aggregation": "macro average per case and version; empty-gold cases score P=R=1.0 when nothing is selected, else 0; chains n/a on empty-gold cases",
+ "gold_history_contract": "gold_history entries store previous/current material and optional sets with effective_from; aggregate.py --as-of DATE reverts entries later than DATE, latest first. must_cover_history is a record of wording changes; the scorer warns when the as-of wording differs from the wording the judges scored, it does not rescore coverage. A case reported in a round keeps its gold for that round; changes derived while the round is open live under proposed_gold_changes and are applied only before the next round. Applying a proposal to a held-out case moves that case to Dev.",
+ "contamination_rule": "a gold changed by reference to a held-out case moves that case out of the held-out set; rationales therefore cite must_cover content, not sibling cases",
+ "version_vocabulary": {
+  "old": "seven-question taxonomy (2026-09-01)",
+  "new": "eight-question taxonomy (2026-09-09)"
+ },
+ "frozen_gold_rule": "a case reported in a round keeps its gold for that round. Each gold_history entry carries recorded_on (when it was written) and effective_from (first round date it is in force for); a change must be recorded before the round it first applies to. Entries with kind 'relabel' (pure taxonomy renames that change no required content) are exempt. aggregate.py --as-of errors when a reported case has a non-relabel entry in force (effective_from <= as-of) that was recorded on or after the as-of date",
+ "conditions": {
+  "routed": "SKILL.md plus the route files the generator's own triage selects",
+  "main-only": "SKILL.md only",
+  "noskill": "prompt only; version 'none'"
+ },
+ "meta_contract": "each generator writes <case>-<label>.meta.json with selected_questions (list), unknown_questions (list, questions marked unknown rather than selected), and files_read (absolute paths); routed integrity is checked against selected_questions plus unknown_questions"
+}

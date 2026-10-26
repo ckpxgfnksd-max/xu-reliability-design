@@ -10,17 +10,17 @@ do not copy domain details blindly.
 A controller rotates tenant signing keys: create a new secret, update services, verify, and revoke
 the old secret. Desired state is stored in PostgreSQL; services cache keys for five minutes.
 
-### Seven-question routing
+### Question routing
 
 | Question | Judgment |
 |---|---|
 | Q1 intent | Rotation request needs unique target generation, authorization, non-duplicate key, and “old key is still active” precondition. (`P1`) |
-| Q2 state | PostgreSQL is intent authority; secret store, service caches, controller checkpoint, and audit log are partial views. Names are insufficient; use key ID + generation. (`P2`, `P12`) |
+| Q2 state | PostgreSQL is intent authority; secret store, service caches, controller checkpoint, and audit log are partial views. Names are insufficient; use key ID + generation. (`P2`) |
 | Q3 transition | `stage-new → distribute → verify-real-auth → activate → revoke-old → collect`; every stage is durable and idempotent. (`P3`, `P10`) |
 | Q4 seams | DB↔secret store, controller↔service config, gateway↔key caches, and audit system have explicit late-success/version semantics. (`P4`) |
 | Q5 oracle | A real request signed by new key succeeds everywhere; old key fails everywhere only after activation; clean and crash runs normalize to one active generation. (`P5`, `P11`) |
 | Q6 propagation | Distribution is bounded by cohort; failure pauses before revoke; no controller may activate a second generation concurrently. (`P6`, `P7`) |
-| Q7 evidence | Candidate run uses the production role and real secret service in canary; cache behavior is compared with the test double. (`P8`, `P14`) |
+| Q7 fidelity | Candidate run uses the production role and real secret service in canary; cache behavior is compared with the test double. (`P8`, `P14`) |
 
 ### Highest risks and acceptance
 
@@ -42,7 +42,7 @@ There is no durable stage, generation fence, cache oracle, or uncertain-result h
 
 Drain a degraded cell to two neighboring cells using a global traffic controller.
 
-### Seven-question routing
+### Question routing
 
 | Question | Judgment |
 |---|---|
@@ -52,7 +52,7 @@ Drain a degraded cell to two neighboring cells using a global traffic controller
 | Q4 seams | Frontends, caches, databases, queues, auth, and observability have ownership and capacity contracts. (`P4`, `P13`) |
 | Q5 oracle | Customer success, P99, error budget, queue age, and data-integrity checks—not routing weights—prove the step. (`P5`) |
 | Q6 control | Maximum step/rate/radius, priority arbitration, cold-cache guard, stop and restore are explicit. (`P6`, `P7`) |
-| Q7 evidence | Regular small-radius production drains calibrate dependency and capacity models before disaster scale. (`P8`, `P14`) |
+| Q7 fidelity | Regular small-radius production drains calibrate dependency and capacity models before disaster scale. (`P8`, `P14`) |
 
 ### Recovery contract
 
@@ -85,16 +85,16 @@ caches and overloads shared storage; the recovery action expands the incident.
 A metadata client waits for two of three replicas. A replica can remain connected while taking
 30 seconds per operation.
 
-### Seven-question routing
+### Question routing
 
 | Question | Judgment |
 |---|---|
-| Q2 state | Liveness and replica health are partial observations; a connected channel is not a usable replica. (`P2`, `P7`) |
+| Q2 state | Liveness and replica health are partial observations; a connected channel is not a usable replica. (`P2`) |
 | Q3 transition | Request identity survives retry; a late response cannot apply a second mutation. (`P3`) |
 | Q4 seams | Client↔replica contract distinguishes no-send, accepted-then-timeout, slow, stale, and wrong result. (`P4`) |
 | Q5 oracle | External completion, unique effect, quorum value consistency, and recovery after slowness ends. (`P5`, `P11`) |
 | Q6 propagation | Two valid acknowledgements complete the request; the third is cancelled; per-request and global budgets bound work. (`P6`, `P7`) |
-| Q7 evidence | Latency distributions and fault correlation come from deployment, not a fixed lab average. (`P14`) |
+| Q7 fidelity | Latency distributions and fault correlation come from deployment, not a fixed lab average. (`P14`) |
 
 ### Acceptance matrix
 
@@ -117,16 +117,16 @@ connectivity as health. One fail-slow replica consumes the pool and spreads outa
 
 Expand a support role from tenant-specific read access to region-wide troubleshooting.
 
-### Seven-question routing
+### Question routing
 
 | Question | Judgment |
 |---|---|
 | Q1 intent | Scope, resource classes, break-glass duration, and ticket identity are validated before policy publish. (`P1`, `P9`) |
-| Q2 state | Policy files, compiled gateway policy, application checks, caches, and access logs are distinct views. (`P2`, `P12`) |
+| Q2 state | Policy files, compiled gateway policy, application checks, caches, and access logs are distinct views. (`P2`) |
 | Q3 transition | Publish and cache activation have generations; revoke/expiry is a tested recovery transition. (`P3`, `P10`) |
 | Q4 seams | Identity provider, gateway, application ownership, and data relationships share explicit subject/resource semantics. (`P4`) |
 | Q5 oracle | Before/after request-decision diff over production code/data explains every `deny→allow`; real revocation requests verify effect. (`P5`) |
-| Q7 evidence | The isolated test uses production authorization logic and production-shaped relational data. (`P8`, `P14`) |
+| Q7 fidelity | The isolated test uses production authorization logic and production-shaped relational data. (`P8`, `P14`) |
 
 ### Acceptance
 
@@ -189,7 +189,7 @@ resolved despite a larger incident.
 Tenants upload request filters that run in a high-performance host. A verifier checks filters before
 load; some safe filters currently require unsafe helpers to pass.
 
-### Seven-question routing
+### Question routing
 
 | Question | Judgment |
 |---|---|
@@ -198,7 +198,7 @@ load; some safe filters currently require unsafe helpers to pass.
 | Q4 seams | Source language, compiler, verifier, runtime, and host APIs share a mapped safety contract. (`P4`, `P13`) |
 | Q5 oracle | Memory/type/capability invariants plus panic/timeout cleanup and reference-path differential. (`P5`, `P11`) |
 | Q6 containment | CPU/memory/time and capability blast radius are hard runtime limits. (`P6`, `P7`) |
-| Q7 evidence | Representative safe and adversarial programs measure false rejection, bypass, and runtime containment. (`P8`, `P14`) |
+| Q7 fidelity | Representative safe and adversarial programs measure false rejection, bypass, and runtime containment. (`P8`, `P14`) |
 
 ### Acceptance
 

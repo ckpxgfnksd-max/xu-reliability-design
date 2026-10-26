@@ -1,7 +1,7 @@
 # Q5 — Behavioral correctness, progress, and conformance
 
-Principles: P5, P11. Default provenance: `XU-SYNTHESIS` from `xu-054`, `xu-038`, `xu-068`,
-`xu-076`, `xu-043`, `xu-049`, `xu-026`, `xu-020`, `xu-031`, `xu-021`, `xu-004`, `xu-011`.
+Principles: P5, P11. Default provenance: `XU-SYNTHESIS`; anchors Sieve `xu-054`, Acto `xu-038`,
+Anvil `xu-031`, Multi-Grained Specifications `xu-021`, P-DIFF `xu-076`.
 
 ## Guideline
 

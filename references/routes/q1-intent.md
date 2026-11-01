@@ -30,9 +30,14 @@ the cutover. The response identifies the failing precondition and data-loss or l
 - mutate one value within its legal syntax but outside its environmental constraint;
 - change two valid fields into an invalid relationship;
 - activate a late/rare path with the candidate configuration;
+- violate a hidden operation precondition, add an unknown owned key, and try a candidate value that
+  triggers a dormant bug;
 - use the real runtime identity and a stale version pair;
-- prove rejection occurs before external effects and gives a repairable explanation;
+- prove rejection occurs at the earliest layer able to know it, before external effects, with a
+  distinguishable and repairable explanation;
 - compare declared policy with actual allow/deny behavior through caches and gateways.
+- send a valid-but-unusual candidate through a behavioral test; it must not be rejected only for
+  looking unfamiliar.
 
 Failure signal: validation is green while the candidate produces silent no-effect, over-grant,
 late-path failure, or requires an unsafe workaround.

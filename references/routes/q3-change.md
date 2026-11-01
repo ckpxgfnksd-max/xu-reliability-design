@@ -35,12 +35,18 @@ revocation is not allowed until every required reader has demonstrated N+1 behav
 
 ## Acceptance
 
-- interrupt after each externally visible effect, restart, and compare normalized final behavior;
+- interrupt after each externally visible effect and restart: it must converge, compensate, or enter
+  a named guarded terminal state; compare normalized final behavior;
 - duplicate every request and return success after the caller timeout;
 - race forward action, retry, and rollback;
 - run the old version against the migrated state and the new version against the unmigrated state;
 - wedge the normal queue and invoke the emergency recovery path;
-- inject failure into recovery itself and prove durable resume;
+- inject insufficient target capacity, an unhealthy dependency, stale recovery intent, executor
+  crash, and undo failure into recovery itself, and prove durable resume;
+- expand a recovery exercise from a safe slice; a health regression pauses or restores rather than
+  continuing on a fixed schedule;
+- run recovery often enough to expose runbook, dependency, permission, and capacity drift, and
+  update the executable contracts with what it finds;
 - for TNR, show the exact health vector, comparison rule, undo bound, and stop condition.
 
 Failure signal: "rerun the reverse script", process exit, a database phase flag, or "redeploy the

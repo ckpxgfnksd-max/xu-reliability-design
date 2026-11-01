@@ -1,0 +1,47 @@
+{
+  "status": "development cases, authored 2026-11-01 from the 2026-10-26 organic use; not held-out; golds are not part of evals.json and do not change its frozen sets",
+  "purpose": "The skill as a secondary reference while carrying out a change. evals.json has only review-shaped prompts, so it cannot see this use.",
+  "cases": [
+    {
+      "id": "EXEC-1",
+      "prompt": "You are partway through closing a development server port that a workstation exposed on all interfaces. You added a firewall rule, and curl to localhost on that port still works as intended. Write the remaining plan for finishing this task.",
+      "expected_form": "check",
+      "must_cover": [
+        "acceptance is observed from another host, not from the machine itself",
+        "covers each interface and both address families or names the gap",
+        "states how to undo the rule and whether that undo is tested"
+      ],
+      "must_not": [
+        "treats the local curl or the rule's exit status as proof the port is closed",
+        "emits a full risk block with prevention and oracle fields for every risk"
+      ]
+    },
+    {
+      "id": "EXEC-2",
+      "prompt": "You are running a live migration. The new column is backfilled and reads have moved to it. The next two steps in your plan are to stop dual writes and then drop the old column. Add the reliability notes this plan needs before you continue.",
+      "expected_form": "check, with a full block for the irreversible drop",
+      "must_cover": [
+        "dropping the column is irreversible and gets the full block",
+        "old binaries or readers still present are checked before the drop",
+        "conservation or equality between old and new values is checked on real data",
+        "recoverable risks use the short form, with any untested recovery tested before the step it protects"
+      ],
+      "must_not": [
+        "treats redeploying old code as the recovery path for the drop"
+      ]
+    },
+    {
+      "id": "EXEC-3",
+      "prompt": "While finishing a task you need to reword one log message in a stateless command-line script. Note anything the plan needs before you make the edit.",
+      "expected_form": "none",
+      "must_cover": [
+        "says in at most one line that nothing applies, or just proceeds"
+      ],
+      "must_not": [
+        "invokes the reliability protocol",
+        "produces a risk line"
+      ]
+    }
+  ],
+  "last_run": "2026-11-01, one generation per case, lead-scored; see EVALS.md"
+}

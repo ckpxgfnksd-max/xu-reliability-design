@@ -27,17 +27,17 @@ Use the authorized execution host and existing resource runner. Keep experiments
 in an isolated source copy and `.specula-lite/` artifact directory; do not test by
 killing real user jobs. Pin source bytes/revision, relevant local edits, upstream
 tool revision and any local tool patch. Verify downloaded tool dependencies. A
-checksum failure is a setup failure, never a reason to disable verification.
-If a checksum differs from the pinned expectation, stop execution that depends on
-that artifact and preserve the expected digest, observed digest, artifact and failure.
-A new digest from the same download origin or release API can diagnose rolling
-asset changes; it does not independently authenticate the replacement. Resume only
-after verification against an independently trusted signature, attestation or digest
-channel, recording the trust anchor and verification result. Otherwise report the
-dependency blocker and continue work that does not execute or depend on that artifact.
-Label earlier checker outputs from an unresolved replacement as provenance-unverified
-and inconclusive for assurance; retain the observations, but exclude them from passing
-acceptance evidence. Independently reproduced code behavior remains separate evidence.
+checksum failure is a setup failure, never a reason to disable verification: stop
+execution that depends on that artifact and preserve the expected digest, observed
+digest, artifact and failure. A new digest from the same download origin or release
+API can diagnose rolling asset changes; it does not independently authenticate the
+replacement. Resume only after verification against an independently trusted
+signature, attestation or digest channel, recording the trust anchor and verification
+result. Otherwise report the dependency blocker and continue work that does not
+execute or depend on that artifact. Label earlier checker outputs from an unresolved
+replacement as provenance-unverified and inconclusive for assurance; retain the
+observations, but exclude them from passing acceptance evidence. Independently
+reproduced code behavior remains separate evidence.
 
 ## Make the model answer the question
 

@@ -41,7 +41,14 @@ on validation failure. A slow target is not treated as green merely because TCP 
 - disconnect a large cohort of targets for longer than the retry horizon; backlog stays bounded and
   a reconnecting target does not receive superseded intent;
 - exhaust target capacity and remove a fault domain during a move;
-- observe useful goodput, backlog, shed work, and recovery after the fault ends;
+- abandon a caller mid-work: deadlines propagate, and work completing after abandonment is cancelled
+  or accounted for and cannot silently commit twice (`P7`);
+- hold a dependency slow until retries and hedges spend their end-to-end budget: total attempts stay
+  within it, queues and worker/connection pools stay bounded, and the dependency cannot monopolize
+  every worker or quorum wait or spread failure beyond the stated domain (`P7`; retry-budget mechanics may use
+  `COMPANION` guidance);
+- observe useful goodput, occupied resources, retry work, backlog age, shed work, and time to recover
+  after the fault ends (`P7`);
 - prove the controller stays within step, rate, and radius bounds and stops when evidence is
   insufficient.
 

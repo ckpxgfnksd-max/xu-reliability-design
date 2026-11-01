@@ -3,6 +3,9 @@
 These examples demonstrate the skill's reasoning shape. Adapt the obligations to the actual system;
 do not copy domain details blindly.
 
+Examples 1 to 4 are deliberately large systems. Most reviews select two to four questions; Example 5
+shows that shape, Example 6 shows a decline, and Example 7 shows the Check form.
+
 ## Example 1 — Credential rotation controller
 
 ### Proposal
@@ -14,13 +17,13 @@ the old secret. Desired state is stored in PostgreSQL; services cache keys for f
 
 | Question | Judgment |
 |---|---|
-| Q1 intent | Rotation request needs unique target generation, authorization, non-duplicate key, and “old key is still active” precondition. (`P1`) |
-| Q2 state | PostgreSQL is intent authority; secret store, service caches, controller checkpoint, and audit log are partial views. Names are insufficient; use key ID + generation. (`P2`) |
-| Q3 transition | `stage-new → distribute → verify-real-auth → activate → revoke-old → collect`; every stage is durable and idempotent. (`P3`, `P10`) |
-| Q4 seams | DB↔secret store, controller↔service config, gateway↔key caches, and audit system have explicit late-success/version semantics. (`P4`) |
-| Q5 oracle | A real request signed by new key succeeds everywhere; old key fails everywhere only after activation; clean and crash runs normalize to one active generation. (`P5`, `P11`) |
-| Q6 propagation | Distribution is bounded by cohort; failure pauses before revoke; no controller may activate a second generation concurrently. (`P6`, `P7`) |
-| Q7 fidelity | Candidate run uses the production role and real secret service in canary; cache behavior is compared with the test double. (`P8`, `P14`) |
+| Q1 Intent | Rotation request needs unique target generation, authorization, non-duplicate key, and “old key is still active” precondition. (`P1`) |
+| Q2 State | PostgreSQL is intent authority; secret store, service caches, controller checkpoint, and audit log are partial views. Names are insufficient; use key ID + generation. (`P2`) |
+| Q3 Change | `stage-new → distribute → verify-real-auth → activate → revoke-old → collect`; every stage is durable and idempotent. (`P3`, `P10`) |
+| Q4 Seams | DB↔secret store, controller↔service config, gateway↔key caches, and audit system have explicit late-success/version semantics. (`P4`) |
+| Q5 Correctness | A real request signed by new key succeeds everywhere; old key fails everywhere only after activation; clean and crash runs normalize to one active generation. (`P5`, `P11`) |
+| Q6 Control | Distribution is bounded by cohort; failure pauses before revoke; no controller may activate a second generation concurrently. (`P6`, `P7`) |
+| Q7 Fidelity | Candidate run uses the production role and real secret service in canary; cache behavior is compared with the test double. (`P8`, `P14`) |
 
 ### Highest risks and acceptance
 
@@ -36,49 +39,7 @@ the old secret. Desired state is stored in PostgreSQL; services cache keys for f
 `UPDATE keys SET active=true`; restart services; revoke old key. Readiness checks only PostgreSQL.
 There is no durable stage, generation fence, cache oracle, or uncertain-result handling.
 
-## Example 2 — Datacenter drain and traffic failover
-
-### Proposal
-
-Drain a degraded cell to two neighboring cells using a global traffic controller.
-
-### Question routing
-
-| Question | Judgment |
-|---|---|
-| Q1 intent | Drain target/radius and emergency override are typed; dependencies and remaining capacity are preconditions. (`P1`) |
-| Q2 state | Traffic, capacity, cache warmth, queues, and service health arrive at different rates; observation age accompanies every decision. (`P2`) |
-| Q3 transition | Dependency DAG executes small durable traffic steps with inverse restore. (`P3`, `P10`) |
-| Q4 seams | Frontends, caches, databases, queues, auth, and observability have ownership and capacity contracts. (`P4`, `P13`) |
-| Q5 oracle | Customer success, P99, error budget, queue age, and data-integrity checks—not routing weights—prove the step. (`P5`) |
-| Q6 control | Maximum step/rate/radius, priority arbitration, cold-cache guard, stop and restore are explicit. (`P6`, `P7`) |
-| Q7 fidelity | Regular small-radius production drains calibrate dependency and capacity models before disaster scale. (`P8`, `P14`) |
-
-### Recovery contract
-
-1. Verify every mandatory dependency is available in target cells and spare capacity includes
-   cold-cache/backlog load.
-2. Shift 2%; wait for a health-window based on observations, not a fixed sleep.
-3. If guardrails hold, advance through bounded stages. If any degrades, stop and restore that stage.
-4. Persist each committed stage and inverse; executor restart resumes without replaying a committed
-   routing mutation.
-5. If maximum safe target capacity is insufficient, shed/degrade intentionally rather than continue
-   the drain.
-
-### Acceptance
-
-- Remove one target dependency, understate target capacity, delay health telemetry, crash the drain
-  executor after every stage, and fail one inverse restore.
-- The controller must not exceed the current safe radius; it either resumes, compensates, or stops
-  in a guarded state with operator-visible evidence.
-- A small-radius exercise must falsify a deliberately stale dependency graph.
-
-### Bad design
-
-Move 100% on a fixed five-minute schedule because both target cells are “green.” The transfer cools
-caches and overloads shared storage; the recovery action expands the incident.
-
-## Example 3 — Fail-slow quorum service
+## Example 2 — Fail-slow quorum service
 
 ### Proposal
 
@@ -89,12 +50,12 @@ A metadata client waits for two of three replicas. A replica can remain connecte
 
 | Question | Judgment |
 |---|---|
-| Q2 state | Liveness and replica health are partial observations; a connected channel is not a usable replica. (`P2`) |
-| Q3 transition | Request identity survives retry; a late response cannot apply a second mutation. (`P3`) |
-| Q4 seams | Client↔replica contract distinguishes no-send, accepted-then-timeout, slow, stale, and wrong result. (`P4`) |
-| Q5 oracle | External completion, unique effect, quorum value consistency, and recovery after slowness ends. (`P5`, `P11`) |
-| Q6 propagation | Two valid acknowledgements complete the request; the third is cancelled; per-request and global budgets bound work. (`P6`, `P7`) |
-| Q7 fidelity | Latency distributions and fault correlation come from deployment, not a fixed lab average. (`P14`) |
+| Q2 State | Liveness and replica health are partial observations; a connected channel is not a usable replica. (`P2`) |
+| Q3 Change | Request identity survives retry; a late response cannot apply a second mutation. (`P3`) |
+| Q4 Seams | Client↔replica contract distinguishes no-send, accepted-then-timeout, slow, stale, and wrong result. (`P4`) |
+| Q5 Correctness | External completion, unique effect, quorum value consistency, and recovery after slowness ends. (`P5`, `P11`) |
+| Q6 Control | Two valid acknowledgements complete the request; the third is cancelled; per-request and global budgets bound work. (`P6`, `P7`) |
+| Q7 Fidelity | Latency distributions and fault correlation come from deployment, not a fixed lab average. (`P14`) |
 
 ### Acceptance matrix
 
@@ -111,7 +72,7 @@ A metadata client waits for two of three replicas. A replica can remain connecte
 Wait for all three because “replication is safer,” retry every timeout at two layers, and use TCP
 connectivity as health. One fail-slow replica consumes the pool and spreads outage to healthy work.
 
-## Example 4 — RBAC expansion
+## Example 3 — RBAC expansion
 
 ### Proposal
 
@@ -121,12 +82,12 @@ Expand a support role from tenant-specific read access to region-wide troublesho
 
 | Question | Judgment |
 |---|---|
-| Q1 intent | Scope, resource classes, break-glass duration, and ticket identity are validated before policy publish. (`P1`, `P9`) |
-| Q2 state | Policy files, compiled gateway policy, application checks, caches, and access logs are distinct views. (`P2`) |
-| Q3 transition | Publish and cache activation have generations; revoke/expiry is a tested recovery transition. (`P3`, `P10`) |
-| Q4 seams | Identity provider, gateway, application ownership, and data relationships share explicit subject/resource semantics. (`P4`) |
-| Q5 oracle | Before/after request-decision diff over production code/data explains every `deny→allow`; real revocation requests verify effect. (`P5`) |
-| Q7 fidelity | The isolated test uses production authorization logic and production-shaped relational data. (`P8`, `P14`) |
+| Q1 Intent | Scope, resource classes, break-glass duration, and ticket identity are validated before policy publish. (`P1`, `P9`) |
+| Q2 State | Policy files, compiled gateway policy, application checks, caches, and access logs are distinct views. (`P2`) |
+| Q3 Change | Publish and cache activation have generations; revoke/expiry is a tested recovery transition. (`P3`, `P10`) |
+| Q4 Seams | Identity provider, gateway, application ownership, and data relationships share explicit subject/resource semantics. (`P4`) |
+| Q5 Correctness | Before/after request-decision diff over production code/data explains every `deny→allow`; real revocation requests verify effect. (`P5`) |
+| Q7 Fidelity | The isolated test uses production authorization logic and production-shaped relational data. (`P8`, `P14`) |
 
 ### Acceptance
 
@@ -144,7 +105,7 @@ Expand a support role from tenant-specific read access to region-wide troublesho
 Review a textual policy diff, publish, and assert that the policy row changed. Under incident
 pressure, the on-call uses `GRANT ALL` because denial feedback cannot identify the missing relation.
 
-## Example 5 — AI SRE remediation agent
+## Example 4 — AI SRE remediation agent
 
 ### Proposal
 
@@ -182,36 +143,68 @@ The agent gets cluster-admin shell. It sees high latency, globally clears cache,
 miss storm, then tries an unrelated scale-up. Each command succeeds, so the benchmark calls it
 resolved despite a larger incident.
 
-## Example 6 — Safe extension framework
+## Example 5 — Two-question review: TLS certificate replacement
 
 ### Proposal
 
-Tenants upload request filters that run in a high-performance host. A verifier checks filters before
-load; some safe filters currently require unsafe helpers to pass.
+Replace the certificate on one reverse proxy before it expires, then reload the proxy. No other
+component holds the certificate.
 
 ### Question routing
 
 | Question | Judgment |
 |---|---|
-| Q1 intent | Extension capabilities, resource budgets, and permitted state transitions are typed at source level. (`P1`, `P9`) |
-| Q3 transition | Load/replace/unload is generation-fenced and crash safe. (`P3`) |
-| Q4 seams | Source language, compiler, verifier, runtime, and host APIs share a mapped safety contract. (`P4`, `P13`) |
-| Q5 oracle | Memory/type/capability invariants plus panic/timeout cleanup and reference-path differential. (`P5`, `P11`) |
-| Q6 containment | CPU/memory/time and capability blast radius are hard runtime limits. (`P6`, `P7`) |
-| Q7 fidelity | Representative safe and adversarial programs measure false rejection, bypass, and runtime containment. (`P8`, `P14`) |
+| Q3 Change | Install and reload are two effects; a failed reload with the new file in place leaves the next restart broken. |
+| Q8 Diagnosability | During an incident a responder must tell which certificate is actually served, not which file is on disk. |
 
-### Acceptance
+No other component depends on the certificate and nothing acts on it automatically, so the
+remaining triggers are no and the review says nothing about them. The gap between file and served
+certificate matters here only as diagnostic evidence, which is why it sits under Q8.
 
-- Every verifier failure maps to a source-level object, violated contract, and safe repair.
-- Representative safe filters pass without bytecode shaping or unsafe helpers.
-- Unsafe escape hatches have explicit capabilities, owners, call sites, and negative tests; trend is
-  reviewed.
-- Inject panic, timeout, allocation exhaustion, concurrent unload, and compiler/verifier version
-  change; the host remains safe and the old/new extension generation cannot overlap incorrectly.
-- Post-verification fusion/optimization is checked for semantic and capability equivalence.
+### Risk chains
 
-### Bad design
+```text
+Risk: reload fails after the file is swapped  (Q3, P3)
+Trigger → consequence: invalid chain, reload refused → current process serves the old cert until the next restart, which then fails to start
+Prevention: validate the new pair with the proxy's config check before the swap; keep the old pair beside it
+Oracle: an external TLS handshake returns the new serial and expiry
+Recovery: restore the old pair and reload; the handshake returns the old serial
+Acceptance: install a deliberately mismatched key; check refuses before the swap; external handshake unchanged
+```
 
-A bytecode verifier rejects a safe loop. Developers split the program and share state through an
-unsafe helper. The code loads, but the helper bypasses memory/synchronization guarantees and becomes
-the real unverified interface.
+```text
+Risk: responder trusts the file on disk  (Q8, P12)
+Trigger → consequence: new file present, old process still serving → incident triage rules out the certificate while the expired one is live
+Prevention: record the served serial and expiry at the observation point responders use
+Oracle: the recorded serial equals the one an external handshake returns
+Recovery: compare the served serial against the file and reload or restore the pair
+Acceptance: swap the file without reloading; the record still shows the old serial and differs from the file
+```
+
+## Example 6 — Decline
+
+### Proposal
+
+Rename a label and add a sort option to a settings page.
+
+### Answer
+
+No trigger is yes, so say that in one line and do the task. Do not list the questions that were not
+selected.
+
+## Example 7 — Check form during execution
+
+### Task
+
+An agent is closing a development port that a workstation exposed on all interfaces. The deliverable
+is the closed port, so the risk lines go in the task's existing plan.
+
+```text
+Risk: rule passes locally but the port stays reachable  (Q7)
+Trigger → consequence: firewall rule matches one binary or one address family → port still open from another host
+Acceptance: connect from a second host over each interface and over IPv4 and IPv6, with a known-open control port; no connection to the closed port is established; the loopback use still works
+Recovery: remove the added rule from the saved ruleset; tested in this session
+```
+
+Testing from the same machine would pass while the risk stands, which is why the acceptance names
+an off-host observation point.

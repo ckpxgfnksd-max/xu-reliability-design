@@ -9,11 +9,11 @@ The skill turns recurring findings across configuration, controllers, distribute
 - `SKILL.md` — compact entry point and task router.
 - `references/principles.md` — 14 corpus-wide principles. Every principle includes a guideline, acceptance criterion, example, counterexample, and full-text evidence anchors.
 - `references/routes/` — eight task-specific routes covering intent, state, change, seams, correctness, control, fidelity, and diagnosability.
-- `references/checklists.md` — review and acceptance checklists.
+- `references/checklists.md` — inventories and recurring bug shapes. Executable acceptance lives in the route files.
 - `references/examples.md` — worked design-review examples.
 - `references/formal-verification.md` — guidance for choosing specifications, model checking, testing, and runtime checks.
-- `references/specula-pilot.md` — authorized focused investigations, real-code reproduction, and explicit Lite conformance and dependency-provenance limits.
-- `evals/` — versioned cases, rubrics and aggregation, including the five ownership-pilot prompts.
+- `references/specula-pilot.md` — optional authorized investigations, real-code reproduction, and explicit Lite conformance and dependency-provenance limits. This path needs a separately installed, pinned Specula Lite.
+- `evals/` — versioned cases, rubrics and aggregation, including the five ownership-pilot prompts and three execution-time cases.
 - `references/paper-ledger.md` — the 97-paper evidence ledger.
 - `EVALS.md` — evaluation protocol, results, limitations, and the gate for future automated optimization.
 
@@ -67,6 +67,12 @@ Use $xu-reliability-design to review this controller design. Identify violated p
 required evidence, failure scenarios, and testable acceptance criteria.
 ```
 
+Three modes apply:
+
+- **Review** — the default: triage, then ranked risk chains for the selected questions only.
+- **Check** — while carrying out a change, where the work is the deliverable. Each risk gets a short form with acceptance and recovery status, and irreversible or no-recovery steps keep the full block.
+- **Explain** — questions about Xu's research or principles.
+
 The skill distinguishes three attribution levels:
 
 - `XU-DIRECT` — explicitly supported by a cited Xu-coauthored paper.
@@ -76,9 +82,10 @@ The skill distinguishes three attribution levels:
 ## Validation status
 
 - Package and frontmatter validation: pass.
-- Current revision review: an independent fixed review passed after correcting two non-blocking evidence and status findings. The original verdict is retained in the private run record.
+- Current revision review: independent review passed with no blocking findings after earlier rounds failed on real defects, which were fixed. See the 2026-11-01 entry in EVALS.md.
 - Attribution probe: 5/5 after preserving and correcting the original 4/5 failure case.
 - Ownership development cases: 20 outputs (five prompts, two repetitions per arm); correct dispositions 10/10 in both arms, complete coverage 8/10 to 10/10. No held-out or statistical uplift claim.
+- Execution-time development cases: one generation per case, scored by the author, not blinded, and tuned on the same cases. The change to trigger wording is unmeasured.
 - TLC dependency provenance: a mismatched replacement stays blocked pending independently trusted authentication; prior unresolved checker outputs are inconclusive for assurance.
 - Automated optimization: intentionally not started; a protocol-compliant per-case routed baseline has not yet been certified.
 

@@ -35,6 +35,8 @@ old event cannot reach the new generation.
 - delete and recreate the same human-readable name while an old action is queued;
 - race a stale decision with a fresh authoritative update and with a second writer;
 - show that no destructive action crosses a generation fence.
+- reach the same declared intent through different histories and compare normalized end state plus
+  external behavior.
 
 Failure signal: correctness depends on seeing every transition, on an event arriving exactly once,
 or on a value that two writers can set without either learning that it lost.

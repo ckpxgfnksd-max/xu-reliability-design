@@ -1,6 +1,6 @@
 ---
 name: xu-reliability-design
-description: "Reliability review for live-system changes: config/policy, caches/replicas, retried mutations, dependency failures, controllers, authz, agents on production, recovery, test doubles, production diagnosis, and scoped formal-method pilots. Ranked risk chains with falsifiable acceptance; research claims labeled XU-DIRECT / XU-SYNTHESIS / COMPANION from an audited Tianyin Xu (徐天音) corpus; also explains Xu's principles. Not for UI/content or stateless features unless requested."
+description: "Reliability review for live-system changes: config/policy, caches/replicas, retried mutations, dependency failures, controllers, authz, agents on production, recovery, test doubles, production diagnosis, and scoped formal-method pilots. Also 系统可靠性、上线风险、迁移回滚、故障恢复、设计稳不稳, before or during a change to a running system. Ranked risk chains with falsifiable acceptance; research claims labeled XU-DIRECT / XU-SYNTHESIS / COMPANION from an audited Tianyin Xu (徐天音) corpus; also explains Xu's principles. Not for UI/content or stateless features unless requested."
 ---
 
 # Xu Reliability Design
@@ -12,13 +12,15 @@ for design judgment.
 Three modes:
 
 - **Review** (default): triage below, then answer only the selected questions.
-- **Investigate**: when asked to run a formal-method pilot or investigate a state/concurrency
-  failure, select the relevant questions and load `references/formal-verification.md` plus
-  `references/specula-pilot.md`. Execute only the authorized target and fault scope; a review
-  recommendation alone does not authorize installation, experiments, or implementation fixes.
+- **Check**: when you are carrying out a change and the deliverable is the work itself, not a
+  review. Triage the same way, then use the short form under Output and record it in the task's
+  own plan or report, or in the final message if neither exists. A full review block is more than a live hardening or migration task will
+  sustain, and a short form that gets written beats a long one that does not.
 - **Explain**: when the request is about Tianyin Xu's research or principles rather than a design
   under review, load `references/principles.md` and `references/research-map.md` and answer from
   the principles, threads, and audited claims. Skip triage.
+
+A formal-method pilot is a separate optional path, described in the last section.
 
 ## Evidence discipline
 
@@ -113,7 +115,7 @@ or a specific technique is needed. A review that selects Q8 for a diagnosis does
 - principle text with evidence anchors, examples, and counterexamples: `references/principles.md`;
 - Xu tools and their limits: `references/tools.md`;
 - full worked reviews: `references/examples.md`;
-- recurring bug shapes and long-form probes: `references/checklists.md`;
+- recurring bug shapes and inventory checklists: `references/checklists.md`;
 - capacity, overload, and readiness beyond the Xu corpus: `references/large-system-gate.md`
   (`COMPANION`, optional, risk-calibrated).
 
@@ -129,10 +131,43 @@ For **Review**:
 Only when it changes a decision: a compact change/state/seam map; residual risks, fidelity limits,
 and liveness assumptions; paper IDs and evidence labels.
 
-For **Investigate**, deliver the source/tool identities, scope and bounds, selected risk chains,
-actual checker outcomes, code-level reproductions, controls, cleanup, and unresolved candidates.
-Separate model violations from reproduced defects and documented limitations; state whether
-implementation trace validation ran. For **Explain**, answer the question without review blocks.
+For **Explain**, answer the question without review blocks.
+
+For **Check**, give each selected risk these lines:
+
+```text
+Risk: <name>  (<question>)
+Trigger → consequence: <state or input> → <harm>
+Acceptance: <injection or input; observation point; expected result>
+Recovery: <undo path>; tested and passed | untested
+```
+
+Acceptance observes behavior from where the harm would be seen, not the step's own exit status:
+section 4 still applies. Use the full block only for a risk whose step is irreversible or has no
+recovery path. Most recoveries are untested at planning time, so an untested recovery stays in the
+short form, marked `untested`, and testing it becomes a plan step before the step it protects. If
+that step is already applied, test the undo before the next dependent step or task completion.
+Rehearse on a copy or equivalent target; testing an undo on a live system needs authorization. A
+recovery that fails its test, cannot be tested in time, or that a route file names as a failure
+signal (such as redeploying the old build after state changed) counts as no recovery path: hold the
+protected or dependent step, or task completion, until recovery is fixed or the risk owner accepts
+the risk. Evidence
+labels appear only when research changed a decision.
 
 Length follows the number of selected questions, not the protocol. Never emit all eight questions,
 all fourteen principles, or a paper list when a smaller route answers the design question.
+
+## Optional: formal-method investigation
+
+Use only when asked to run a formal-method pilot or investigate a state/concurrency failure: select
+the relevant questions and load `references/formal-verification.md` plus
+`references/specula-pilot.md`. This path needs a pinned Specula Lite and a checker whose provenance
+verifies. If the tool is absent, install it only when that is explicitly authorized. If provenance
+fails, the checksum rule in `specula-pilot.md` governs and reinstalling does not clear it. Either
+way, name the blocker and continue the work that does not depend on it. Execute only the authorized target and fault scope; a review recommendation alone does not
+authorize installation, experiments, or implementation fixes.
+
+Deliver the source/tool identities, scope and bounds, selected risk chains, actual checker outcomes,
+code-level reproductions, controls, cleanup, and unresolved candidates. Separate model violations
+from reproduced defects and documented limitations; state whether implementation trace validation
+ran.

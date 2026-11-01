@@ -6,6 +6,9 @@ engineering adaptations. Numeric stress points without a paper ID are examples t
 the target system, not Xu-derived thresholds. Paper-direct anchors are in `principles.md` and exact
 scope is in `research-map.md`.
 
+Executable acceptance lives in the route files (`references/routes/`); this file holds inventories
+and bug shapes.
+
 For each checked item record `pass + evidence`, `fail + consequence`, `unknown + owner/evidence`, or
 `not applicable + reason`. A checked box without evidence is not a pass.
 
@@ -34,15 +37,6 @@ For each checked item record `pass + evidence`, `fail + consequence`, `unknown +
   violated relationship, likely impact, and safe next action. (`P1`, `P9`)
 - [ ] An LLM/static validator is corroborating evidence, never the sole semantic gate. (`P1`)
 
-### Acceptance probes
-
-- [ ] Inject a value-local error, cross-field error, environment-only error, hidden operation
-  precondition, unknown owned key, and candidate value that triggers a dormant bug.
-- [ ] Each case fails at the earliest layer capable of knowing it and produces a distinguishable,
-  repairable error.
-- [ ] A valid-but-unusual candidate configuration reaches a behavioral test rather than being
-  rejected only for looking unfamiliar.
-
 ## B. State, partial histories, and operations — `XU-SYNTHESIS` (P2/P3/P10)
 
 ### Authority and identity
@@ -69,16 +63,6 @@ For each checked item record `pass + evidence`, `fail + consequence`, `unknown +
   (`P3`, `P10`)
 - [ ] A stuck normal operation cannot permanently block the recovery operation. The independent
   recovery path still preserves concurrency/fencing invariants. (`P10`)
-
-### Perturbation acceptance
-
-- [ ] Crash or stop the executor after each externally visible update; restart must converge,
-  compensate, or enter a named guarded terminal state.
-- [ ] Freeze an old snapshot, restart against an older source, and then let it catch up.
-- [ ] Drop/coalesce a transient event and deliver only the final current state.
-- [ ] Delete and recreate a same-named object while an old action is queued.
-- [ ] Reach the same declared intent through different histories and compare normalized end state
-  plus external behavior.
 
 ## C. Cross-system contracts and fault semantics — `XU-SYNTHESIS` (P4/P7)
 
@@ -111,17 +95,6 @@ For each relevant seam, fill response, retry/compensation, oracle, and recovery 
 - [ ] undocumented precondition or capacity dependency;
 - [ ] emulator/mock behavior that differs from the real dependency.
 
-### Propagation acceptance
-
-- [ ] Deadlines propagate and work completing after caller abandonment is cancelled or accounted
-  for; it cannot silently commit twice. (`P7`)
-- [ ] Retries and hedges have an end-to-end budget; queues and worker/connection pools are bounded.
-  (`P7`; retry-budget mechanics may use `COMPANION` guidance.)
-- [ ] A slow dependency cannot monopolize every worker/quorum wait and spread failure beyond the
-  stated domain. (`P7`)
-- [ ] Measure goodput, occupied resources, retry work, backlog age, and time to recover after the
-  injected slowness stops. (`P7`)
-
 ## D. Recovery, disaster actions, and adaptive control — `XU-SYNTHESIS` (P3/P6/P8/P10)
 
 ### Safety envelope
@@ -146,15 +119,6 @@ For each relevant seam, fill response, retry/compensation, oracle, and recovery 
 - [ ] If pre/post states are incomparable or the action is irreversible, the action is canaried,
   sandboxed, or human-gated rather than falsely declared TNR-safe. (`P10`)
 - [ ] The system can abstain safely when evidence is insufficient. (`P6`, `P10`)
-
-### Recovery acceptance
-
-- [ ] Inject insufficient target capacity, unhealthy dependency, stale recovery intent, executor
-  crash, and undo failure.
-- [ ] Expand exercise radius from a safe slice; health regression pauses or restores rather than
-  continuing on a fixed schedule.
-- [ ] Run the recovery regularly enough to expose runbook, dependency, permission, and capacity
-  drift; discoveries update executable contracts.
 
 ## E. Oracles, liveness, and conformance — `XU-SYNTHESIS` (P5/P11)
 

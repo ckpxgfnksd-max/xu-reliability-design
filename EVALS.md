@@ -578,3 +578,87 @@ Dependency correction: the earlier project-local TLC JAR differed from the pinne
 The unresolved replacement is now **blocked for dependent execution**. Historical SANY/TLC outputs from that replacement remain preserved observations, labelled **provenance-unverified and inconclusive for assurance**, and are excluded from this follow-up's passing evidence. The historical table above records what happened; its checker results must not be read as currently accepted assurance. Independently reproduced real-process failures and regression evidence stand separately. The skill now says to stop on checksum failure, require an independently trusted signature/attestation/digest channel to resume, and report a blocker otherwise. No same-origin repin or “record the limit and proceed” path is permitted. No global cache was deleted and no other agent's dependency setup was changed.
 
 Canonical private paths, raw answers, exact snapshot/producer hashes, runtime attempt IDs, commands, scores, review results and dependency HTTP responses live in the local context record, not this generic skill. The source signatures/build provenance remain unresolved; the operational error was addressed by fail-closed use and corrected acceptance classification, not by claiming a verified binary.
+
+
+## 2026-11-01 — execution-time use, trigger words, and cleanup
+
+This is a focused usage update, not content autoresearch. The NO-GO, `evals/evals.json`, its golds
+and historical scores are unchanged. Six `proposed_gold_changes`, the no-skill and main-only
+conditions, and an independently authored held-out set remain open.
+
+**Why.** The session archive shows one organic task since 2026-09-09: Codex read the skill on
+2026-10-26 during a network-hardening task, loaded four routes, and wrote acceptance conditions but
+no risk block or evidence label. All 22 cases in `evals.json` are review-shaped, so they could not
+see this use.
+
+**Changed.** Description gains Chinese triggers, including 系统可靠性, at 556 characters. New Check
+mode with a short form, full block kept for irreversible steps or those with no recovery path. Formal-method
+investigation moves from a top-level mode to an optional section and states its dependencies. Four
+acceptance subsections leave `checklists.md`, with their unique probes moved into routes
+`q1`/`q2`/`q3`/`q6`. `examples.md` drops the drain and extension examples, adopts the current
+question names, and adds a two-question review with Q8, a decline, and a Check example. The
+checksum rule in `specula-pilot.md` was reworded with every binding part kept, and the harness also
+gains it as a general rule file. The local overlay now exists, so the run pointer named in the
+2026-10-22 entry resolves. A one-line route into this skill was added to `plan-eng-review`.
+
+**Forward test.** Three development cases in `evals/execution-cases.json` plus H1 as a regression,
+pre-change copy versus candidate, one generation each, same model, measured copies without
+`EVALS.md`, `evals/`, `examples.md`, or `eval-artifacts`, and neutral directory names. The lead
+scored the responses knowing the mapping. This is a small development check: no held-out claim, no
+blinded judge, and no noise estimate. The Check rule was tuned on EXEC-1 and EXEC-2 across three
+intermediate versions, so their "after" results are tuned development results, not independent
+measurements. No "after" run used the shipped text. EXEC-1 and EXEC-2 ran on the version that added
+the rule ordering recovery tests before the step they protect. H1 and EXEC-3 ran one version
+earlier, which lacked that rule, the optional-section wording change, and a `q6` label. Review-driven
+edits after all these runs are listed below and were not rerun.
+
+| Case | Criterion | Before | After |
+|---|---|---|---|
+| EXEC-1 | off-host acceptance | hit | hit |
+| EXEC-1 | each interface and address family | hit | hit |
+| EXEC-1 | undo stated with tested status | miss | hit |
+| EXEC-1 | local check not treated as proof | clean | clean |
+| EXEC-1 | not a full block for every risk | violated, 3 of 3 full | clean, 0 of 3 full |
+| EXEC-2 | full block for the irreversible drop | hit | hit |
+| EXEC-2 | old readers checked before the drop | hit | hit |
+| EXEC-2 | equality checked on real data | hit | hit |
+| EXEC-2 | redeploy not used as recovery | clean | clean |
+| EXEC-2 | short form, untested recovery tested before its step | miss, 5 of 5 full | hit, 1 of 6 full, repair rehearsal ordered first |
+| EXEC-3 | no protocol | hit | hit |
+| H1 | selected against gold Q2/Q3/Q4/Q5 | Q2/Q3/Q4, recall 0.75 | Q2/Q3/Q4/Q5, recall 1.0 |
+| H1 | full review, no Check leak | hit | hit |
+
+| Case | Words before | Words after | Full blocks before | Full blocks after |
+|---|---:|---:|---:|---:|
+| EXEC-1 | 994 | 857 | 3 | 0 |
+| EXEC-2 | 1,590 | 1,078 | 5 | 1 |
+| EXEC-3 | 58 | 42 | 0 | 0 |
+| H1 | 1,606 | 1,961 | 5 | 5 |
+
+Selection varied: the EXEC-2 "after" run selected Q3 alone where the "before" run selected Q3 and
+Q5, with the equality check written under Q3. The Q6 unknown raised by the "before" run on EXEC-1
+appeared in some intermediate runs and in the final one. The H1 recall difference is one generation and is not evidence of a
+version effect. The "after" H1 run also loaded `formal-verification.md`, which the "before" run did
+not, so it read more context.
+
+Three intermediate versions were rejected. A three-line form had no recovery line, so a reader
+could not audit the full-block gate. A rule that sent every untested recovery to the full block
+turned Check back into Review, because recoveries are usually untested while planning. A rule with
+no ordering let an untested recovery be tested after the step it protects. The first two were
+found by independent review and a forward run; the third by independent review. The evidence is in
+the run directory named by the local overlay.
+
+Independent review ran on the change: two FAILs with real findings, a PASS with five non-blocking
+findings, and a confirmation FAIL on the run-provenance wording above, all fixed. The edits after
+the forward runs require a recovery test to pass, cover steps already applied, limit where undo is
+rehearsed, hold the protected step when recovery fails, add a pointer to the optional section,
+restore a `q6` clause, and narrow the trigger of the harness checksum rule. DeepSeek returned PASS on
+an earlier round of this diff. The final confirmation returned PASS with three non-blocking
+findings: two one-phrase wording fixes were applied afterwards, and the suggestion to add a hold to
+every no-recovery step was not, because the full block already carries acceptance for those steps.
+
+**Not tested.** Whether the new description changes real triggering; there is no trigger eval, so
+that change is unmeasured until organic use accumulates. `examples.md` is excluded from measured
+copies, so Examples 5 to 7 were not exercised. The `plan-eng-review` route was not exercised. The
+ownership cases OWN-1 to OWN-5 were not rerun after Investigate moved to an optional section. No
+case exercises a failed recovery test, an already-applied step, or the live-undo authorization limit.
